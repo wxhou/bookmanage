@@ -1,0 +1,13 @@
+退出登录接口
+---
+tags:
+  - Auth
+
+security:
+  - APIKeyHeader: ["Authorization"]
+
+responses:
+  200:
+    description: 退出登录成功
+  400:
+    description: 错误的请求

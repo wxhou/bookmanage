@@ -1,0 +1,37 @@
+登录接口
+---
+tags:
+  - Auth
+
+parameters:
+  - name: body
+    in: body
+    require: true
+    schema:
+      properties:
+        email: 
+          type: string
+        password:
+          type: string
+
+responses:
+  200:
+    description: 登录成功
+    schema:
+      type: object
+      required:
+        - access_token
+        - token_type
+        - data
+      properties:
+        access_token:
+          type: string
+          description: token值
+        token_type:
+          type: string
+          description: token类型
+        expires_in:
+          type: integer
+          description: 过期时间
+  400:
+    description: 错误的请求
