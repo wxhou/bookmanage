@@ -32,7 +32,7 @@ def response_succ(result=None, cookies=None, **kwargs):
     else:
         results = deepcopy(result)
     for k, v in kwargs.items():
-        if k == 'code':
+        if k in ['code', 'errcode']:
             results['errcode'] = v
             continue
         results[k] = v

@@ -30,7 +30,7 @@ def login():
         token, expiration = user.generate_token()
         cache.set(user.email, token, timeout=3600)
         db.session.commit()
-        return response_succ()
+        return response_succ(token=token)
     return response_err(ErrCode.COMMON_LOGIN_ERROR, 'login error')
 
 

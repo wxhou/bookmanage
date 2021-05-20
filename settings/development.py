@@ -23,11 +23,12 @@ SCHEDULER_API_ENABLED = True
 
 # SWAGGER_2 文档配置
 # https://swagger.io/specification/v2/
+# https://editor.swagger.io/
 SWAGGER = {
     "swagger": "2.0",
     # 'title': '测试平台接口文档',  # 浏览器标签页名称
     "info": {
-        "title": "BookLibray",  # 网页内标题
+        "title": "图书管理系统",  # 网页内标题
         "version": "1.0.0",
         "description": "图书管理系统(测试环境)",
     },

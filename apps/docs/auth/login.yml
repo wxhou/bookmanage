@@ -1,7 +1,8 @@
 登录接口
 ---
 tags:
-  - Auth
+  - name: Auth
+  
 
 parameters:
   - name: body
@@ -19,19 +20,14 @@ responses:
     description: 登录成功
     schema:
       type: object
-      required:
-        - access_token
-        - token_type
-        - data
+      required: true
       properties:
-        access_token:
+        token:
           type: string
           description: token值
-        token_type:
-          type: string
-          description: token类型
-        expires_in:
+        errcode:
           type: integer
-          description: 过期时间
+        errmsg:
+          type: string
   400:
     description: 错误的请求
