@@ -5,7 +5,7 @@ from flask import g, request, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import BadTimeSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from core.extensions import db
+from core.extensions import db, cache
 
 roles_permissions = db.Table(
     'roles_permissions',
@@ -70,8 +70,8 @@ class User(ModelMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), index=True)
     email = db.Column(db.String(128), unique=True, nullable=False)
-    phone = db.Column(db.String(11), unique=True)
-    avatar = db.Column(db.String(256))
+    phone = db.Column(db.String(11))
+    avatar_id = db.Column(db.Integer)
     password_hash = db.Column(db.String(128))
     token = db.Column(db.String(256))
 
@@ -103,6 +103,15 @@ class User(ModelMixin, db.Model):
             g.current_user = user
             return True
         return False
+
+
+class Avatar(ModelMixin, db.Model):
+    """用户资源"""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    url = db.Column(db.String(256))
+    mtype = db.Column(db.Integer)  # 资源类型(image 1/audio 2/video 3)
+    ctype = db.Column(db.Integer)  # 图片类型(cover 1/content 2)
 
 
 class Press(ModelMixin, db.Model):

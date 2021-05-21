@@ -1,10 +1,17 @@
-
-
 DEBUG = True
 SECRET_KEY = "7fd2ad44-b91a-11eb-a15a-98e0d9885a43"
 SQLALCHEMY_DATABASE_URI = "mysql://root:root1234@localhost/db_booklibray"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_ECHO = True
+
+# upload
+MAX_CONTENT_LENGTH = 50*1024*1024
+ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg'}
+ALLOWED_AUDIO_EXTENSIONS = {'mp3'}
+ALLOWED_VIDEO_EXTENSIONS = {'mp4'}
+UPLOAD_IMAGE_FOLDER = './media/images'
+UPLOAD_AUDIO_FOLDER = './media/audios'
+UPLOAD_VIDEO_FOLDER = './media/videos'
 
 # 分页数
 PAGE_PER_NUM = 15
