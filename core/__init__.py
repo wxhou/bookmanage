@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-
 from flask import Flask
-from flasgger import Swagger
 from flask_cors import CORS
-from core.extensions import (db, migrate, cache)
+from core.extensions import (db, migrate, cache, docs)
 from core.commands import register_commands
 from core.errors import register_errors
 
@@ -25,17 +23,23 @@ def create_app(env=None, celery=None):
     register_commands(app)
     register_errors(app)
     register_blueprints(app)
+    register_docs(app)
     return app
 
 
 def register_blueprints(app):
-    from apps import bp_client
+    from apps.router import bp_client
     app.register_blueprint(bp_client, url_prefix='/client')
+
+
+def register_docs(app):
+    from apps.router import register_docs_apps
+    register_docs_apps(app)
 
 
 def register_extensions(app):
     db.init_app(app)
     migrate.init_app(app=app)
+    docs.init_app(app)
     cache.init_app(app, config=app.config['CACHE_CONFIG'])
-    Swagger(app, config=app.config['SWAGGER_CONFIG'], merge=True)
     CORS(app)

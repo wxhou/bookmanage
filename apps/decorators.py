@@ -12,7 +12,7 @@ def dc_login_required(func):
         if authorization is None:
             return response_err(ErrCode.COMMON_TOKEN_ERROR, 'token error')
         token_type, token = authorization.split(None, 1)
-        if token_type.lower() != 'bearer' and token is None:
+        if token is None or token_type.lower() != 'bearer':
             return response_err(ErrCode.COMMON_TOKEN_ERROR, 'token error')
         if User.validate_token(token):
             return func(*args, **kwargs)
