@@ -13,10 +13,15 @@ bp_auth = Blueprint('bp_auth', __name__)
 
 
 @bp_auth.post('/avatar/upload')
-@doc(tags=["用户管理"], description="上传用户资料")
-@use_kwargs({'image': FileStorage, 'video': FileStorage}, location='files')
+@doc(tags=["用户管理"], summary="上传用户资料")
+@use_kwargs({
+    'image': FileStorage,
+    'video': FileStorage
+},
+            location='files',
+            description='all good here')
+@marshal_with(schema=None, code=200, description='all good here')
 def upload_avatar():
-    """上传资源"""
     image = request.files.get('image')
     video = request.files.get('video')
     ctype = request.files.get('ctype')
@@ -75,7 +80,7 @@ class UserSchema(Schema):
 
 
 @bp_auth.post('/login')
-@doc(tags=["登录注册"])
+@doc(tags=["登录注册"], summary='登录')
 @use_kwargs(UserSchema(only=('email', 'password')))
 def login(**kwargs):
     """登录"""
@@ -89,7 +94,7 @@ def login(**kwargs):
 
 
 @bp_auth.get('/logout')
-@doc(tags=["登录注册"])
+@doc(tags=["登录注册"], summary="登出", deprecated=True)
 @dc_login_required
 def logout():
     """登出"""
@@ -103,12 +108,15 @@ def logout():
 
 @doc(tags=['用户管理'])
 class UserView(MethodResource):
-    """用户管理"""
+    """用户管理
+    """
+    @doc(summary="用户列表")
     @marshal_with(UserSchema(many=True))
     def get(self, **kwargs):
         user = User.query.filter_by(status=0)
         return response_succ(data=UserSchema(many=True).dump(user))
 
+    @doc(summary="新建用户")
     @use_kwargs(UserSchema)
     @marshal_with(UserSchema)
     def post(self, **kwargs):
@@ -128,7 +136,9 @@ class UserView(MethodResource):
 
 @doc(tags=['用户管理'])
 class UserEditView(MethodResource):
-    """用户管理"""
+    """用户管理
+    """
+    @doc(summary="用户详情")
     @use_kwargs({'email': fields.Email()}, location='query')
     @marshal_with(UserSchema)
     def get(self, pk, **kwargs):
@@ -138,8 +148,9 @@ class UserEditView(MethodResource):
             return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
         return response_succ(data=UserSchema().dump(user))
 
+    @doc(summary="修改用户信息")
     @dc_login_required
-    @use_kwargs(UserSchema(partial=True))
+    @use_kwargs(UserSchema(exclude=('email', ), partial=True))
     @marshal_with(UserSchema)
     def put(self, pk, **kwargs):
         user = User.query.filter_by(id=int(pk), status=0).one_or_none()
@@ -150,6 +161,7 @@ class UserEditView(MethodResource):
         db.session.commit()
         return response_succ(UserSchema().dump(user))
 
+    @doc(summary="删除用户")
     @dc_login_required
     def delete(self, pk):
         user = User.query.filter_by(id=int(pk), status=0).one_or_none()
