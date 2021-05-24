@@ -54,6 +54,7 @@ def upload_avatar():
 
 class UserSchema(Schema):
     """用户信息"""
+    id = fields.Integer(dump_only=True)
     username = fields.String(required=False, validate=validate.Length(0, 128))
     email = fields.String(required=True, validate=validate.Email())
     phone = fields.String(required=True, validate=validate.Length(11))
@@ -103,10 +104,9 @@ def logout():
 @doc(tags=['用户管理'])
 class UserView(MethodResource):
     """用户管理"""
-    @use_kwargs({'email': fields.Email()}, location='query')
     @marshal_with(UserSchema(many=True))
     def get(self, **kwargs):
-        user = User.query.filter_by(**kwargs, status=0)
+        user = User.query.filter_by(status=0)
         return response_succ(data=UserSchema(many=True).dump(user))
 
     @use_kwargs(UserSchema)
@@ -125,12 +125,24 @@ class UserView(MethodResource):
                                 'user has exists')
         return response_succ(data=UserSchema().dump(user))
 
+
+@doc(tags=['用户管理'])
+class UserEditView(MethodResource):
+    """用户管理"""
+    @use_kwargs({'email': fields.Email()}, location='query')
+    @marshal_with(UserSchema)
+    def get(self, pk, **kwargs):
+        user = User.query.filter_by(id=int(pk), status=0,
+                                    **kwargs).one_or_none()
+        if user is None:
+            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+        return response_succ(data=UserSchema().dump(user))
+
     @dc_login_required
     @use_kwargs(UserSchema(partial=True))
     @marshal_with(UserSchema)
-    def put(self, **kwargs):
-        user = User.query.filter_by(id=g.current_user.id,
-                                    status=0).one_or_none()
+    def put(self, pk, **kwargs):
+        user = User.query.filter_by(id=int(pk), status=0).one_or_none()
         if user is None:
             return response_err(ErrCode.QUERY_NO_DATA, 'user not exists')
         for k, v in kwargs.items():
@@ -139,10 +151,8 @@ class UserView(MethodResource):
         return response_succ(UserSchema().dump(user))
 
     @dc_login_required
-    @use_kwargs(UserSchema(only=('email', )))
-    def delete(self, **kwargs):
-        user = User.query.filter_by(email=kwargs.get('email'),
-                                    status=0).one_or_none()
+    def delete(self, pk):
+        user = User.query.filter_by(id=int(pk), status=0).one_or_none()
         if user is None:
             return response_err(ErrCode.QUERY_NO_DATA, 'user not exists')
         return response_succ()

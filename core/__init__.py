@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-from flask import Flask
+from flask import g, Flask
 from flask_cors import CORS
-from core.extensions import (db, migrate, cache, docs)
+from settings import BASE_DIR
+from core.extensions import (db, migrate, cache, docs, limiter)
 from core.commands import register_commands
 from core.errors import register_errors
-
-basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+from core.logger import register_logger
 
 def create_app(env=None, celery=None):
     if env is None:
         env = os.getenv('FLASK_ENV', 'development')
     app = Flask(__name__)
     print("use in: ", env)
-    pyfile = os.path.join(basedir, 'settings', env + '.py')
+    pyfile = os.path.join(BASE_DIR, 'settings', env + '.py')
     app.config.from_pyfile(pyfile)
     register_extensions(app)
+    register_logger(app)
+    register_request_hook(app)
     if celery is not None:
         return app
     register_commands(app)
@@ -41,5 +42,12 @@ def register_extensions(app):
     db.init_app(app)
     migrate.init_app(app=app)
     docs.init_app(app)
+    limiter.init_app(app)
     cache.init_app(app, config=app.config['CACHE_CONFIG'])
     CORS(app)
+
+
+def register_request_hook(app):
+    @app.before_request
+    def init_redis():
+        g.redis_obj = cache.cache._write_client = cache.cache._read_clients
