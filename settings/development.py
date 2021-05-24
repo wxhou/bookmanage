@@ -32,8 +32,8 @@ SCHEDULER_API_ENABLED = True
 # SWAGGER_2 文档配置
 # https://swagger.io/specification/v2/
 # https://editor.swagger.io/
-APISPEC_SPEC = APISpec(title='图书管理系统',
+APISPEC_SPEC = APISpec(title='books',
                        version='V1',
-                       openapi_version='3.0.1',
+                       openapi_version='2.0',
                        plugins=[MarshmallowPlugin()])
 APISPEC_SWAGGER_URL = '/docs'
