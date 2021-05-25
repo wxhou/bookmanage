@@ -71,7 +71,7 @@ class UserSchema(Schema):
                                  validate.Regexp("^[a-zA-Z]\w{5,17}$")
                              ])
 
-    avatar_url = fields.Method("get_avatar_url")
+    avatar_url = fields.Method("get_avatar_url", dump_only=True)
 
     def get_avatar_url(self, obj):
         avatar_obj = Avatar.query.filter_by(id=obj.avatar_id,

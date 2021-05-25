@@ -36,4 +36,3 @@ APISPEC_SPEC = APISpec(title='books',
                        version='V1',
                        openapi_version='2.0',
                        plugins=[MarshmallowPlugin()])
-APISPEC_SWAGGER_URL = '/docs'

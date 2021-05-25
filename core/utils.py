@@ -23,11 +23,11 @@ class ErrCode(object):
 
 
 
-def response_err(code, msg=None, *args):
+def response_err(code, msg='', *args):
     """错误返回"""
-    if msg is None:
-        msg = ''
-    return jsonify({'errcode': code, 'errmsg': msg}), *args
+    if args:
+        return jsonify({'errcode': code, 'errmsg': msg}), *args
+    return jsonify({'errcode': code, 'errmsg': msg})
 
 
 def response_succ(result=None, cookies=None, **kwargs):

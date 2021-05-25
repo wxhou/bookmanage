@@ -9,6 +9,7 @@ from core.commands import register_commands
 from core.errors import register_errors
 from core.logger import register_logger
 
+
 def create_app(env=None, celery=None):
     if env is None:
         env = os.getenv('FLASK_ENV', 'development')
