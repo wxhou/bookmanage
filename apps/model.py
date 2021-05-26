@@ -141,6 +141,7 @@ class Book(ModelMixin, db.Model):
     ISBN = db.Column(db.String(64))  # 图书编号
     translator = db.Column(db.String(64))  # 译者
     desc = db.Column(db.Text)  # 简介
+    stock = db.Column(db.Integer) # 库存
     press_id = db.Column(db.Integer, db.ForeignKey('press.id'))  # 出版社ID
     authors = db.relationship('Author',
                               secondary=author_books,

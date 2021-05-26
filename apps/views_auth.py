@@ -1,6 +1,5 @@
 import os
 import sqlalchemy
-from werkzeug.datastructures import FileStorage
 from flask_apispec import doc, marshal_with, use_kwargs, MethodResource
 from flask import g, request, Blueprint, current_app
 from marshmallow import Schema, fields, validate
@@ -13,18 +12,19 @@ bp_auth = Blueprint('bp_auth', __name__)
 
 
 @bp_auth.post('/avatar/upload')
-@doc(tags=["用户管理"], summary="上传用户资料")
-@use_kwargs({
-    'image': FileStorage,
-    'video': FileStorage
-},
-            location='files',
-            description='all good here')
+@doc(tags=["用户管理"], summary="上传用户资料", type='file')
+@use_kwargs(
+    {
+        'image': fields.Raw(),
+        'video': fields.Raw(),
+        'ctype': fields.Str(default=1)
+    },
+    location='files')
 @marshal_with(schema=None, code=200, description='all good here')
-def upload_avatar():
+def upload_avatar(**kwargs):
     image = request.files.get('image')
     video = request.files.get('video')
-    ctype = request.files.get('ctype')
+    ctype = request.form.get('ctype')
     if not any([image, video]):
         return response_err(ErrCode.FILES_UPLOAD_ERROR, 'not file to upload')
     result = {}
@@ -50,7 +50,7 @@ def upload_avatar():
         filepath = os.path.join(current_app.config['UPLOAD_VIDEO_FOLDER'],
                                 filename)
         video.save(filepath)
-        avatar = Avatar(url='/images/' + filename, mtype=3, ctype=ctype)
+        avatar = Avatar(url='/videos/' + filename, mtype=3, ctype=ctype)
         db.session.add(avatar)
         db.session.commit()
         result['video'] = avatar.id

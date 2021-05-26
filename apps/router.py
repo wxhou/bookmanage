@@ -15,9 +15,8 @@ bp_auth.add_url_rule('/user/<int:pk>',
 bp_book.add_url_rule('/press', view_func=PressView.as_view('Press'))
 bp_book.add_url_rule('/press/<int:pk>',
                      view_func=PressEditView.as_view('PressEdit'))
-bp_book.add_url_rule('/book', view_func=BookView.as_view('Book'))
-bp_book.add_url_rule('/book/<int:pk>',
-                     view_func=BookEditView.as_view('BookEdit'))
+bp_book.add_url_rule('/', view_func=BookView.as_view('Book'))
+bp_book.add_url_rule('/<int:pk>', view_func=BookEditView.as_view('BookEdit'))
 
 
 def register_docs_apps(app):
