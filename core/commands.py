@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 import click
 from .extensions import db
-from apps.model import User
+from apps.model import User, Role, Permission
 
 
 def register_commands(app):
@@ -29,15 +29,24 @@ def register_commands(app):
         db.create_all()
 
         user = User.query.first()
+        role = Role.query.filter_by(name='Admin').first()
         if user is not None:
             click.echo('Updating user...')
             user.email = email
+            user.role = role
+            user.active = True
             user.password = password
         else:
             click.echo('Creating user...')
-            user = User(email=email)
+            user = User(email=email, role=role)
             user.password = password
+            user.active = True
             db.session.add(user)
 
         db.session.commit()
         click.echo('Done.')
+
+    @app.cli.command()
+    def initrole():
+        Role.init_role()
+        click.echo("Init Role Done!")

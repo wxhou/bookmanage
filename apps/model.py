@@ -14,9 +14,9 @@ roles_permissions = db.Table(
 
 
 class Permission(db.Model):
-    """权限"""
+    # __tablename__ = 'db_permission'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30), unique=True, index=True)
+    name = db.Column(db.String(30), unique=True)
     roles = db.relationship('Role',
                             secondary=roles_permissions,
                             back_populates='permissions')
@@ -24,8 +24,13 @@ class Permission(db.Model):
 
 class Role(db.Model):
     """角色"""
+    # __tablename__ = 'db_role'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), unique=True, index=True)
+    users = db.relationship(
+        'User',
+        backref='role',
+    )
     permissions = db.relationship('Permission',
                                   secondary=roles_permissions,
                                   back_populates='roles')
@@ -33,12 +38,12 @@ class Role(db.Model):
     @staticmethod
     def init_role():
         roles_permissions_map = {
-            'Locked': ['FOLLOW', 'COLLECT'],
-            'User': ['FOLLOW', 'COLLECT', 'COMMENT', 'UPLOAD'],
-            'Moderator':
-            ['FOLLOW', 'COLLECT', 'COMMENT', 'UPLOAD', 'MODERATE'],
-            'Administrator':
-            ['FOLLOW', 'COLLECT', 'COMMENT', 'UPLOAD', 'MODERATE', 'ADMIN']
+            'Guest': ['SEE'],
+            'User': ['LOGIN', 'SEE', 'LEASE'],
+            'VIP': ['LOGIN', 'SEE', 'LEASE', 'BUY'],
+            'Author': ['LOGIN', 'SEE', 'LEASE', 'BUY', 'WRITE', 'UPLOAD'],
+            'Admin':
+            ['LOGIN', 'SEE', 'LEASE', 'BUY', 'WRITE', 'UPLOAD', 'ADMIN']
         }
         for role_name in roles_permissions_map:
             role = Role.query.filter_by(name=role_name).first()
@@ -67,6 +72,7 @@ class ModelMixin(object):
 
 class User(ModelMixin, db.Model):
     """用户信息"""
+    # __tablename__ = 'db_user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), index=True)
     email = db.Column(db.String(128), unique=True, nullable=False)
@@ -74,6 +80,12 @@ class User(ModelMixin, db.Model):
     avatar_id = db.Column(db.Integer)
     password_hash = db.Column(db.String(128))
     token = db.Column(db.String(256))
+    active = db.Column(db.Boolean, default=False)
+
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
+
+    def __repr__(self):
+        return '<User {}>'.format(self.email)
 
     @property
     def password(self):
@@ -101,12 +113,28 @@ class User(ModelMixin, db.Model):
         user = User.query.filter_by(id=data.get('id'), status=0).one_or_none()
         if user is not None and user.token == token:
             g.current_user = user
+            current_app.logger.info(g.current_user)
             return True
         return False
+
+    @property
+    def is_admin(self):
+        return self.role.name == 'Admin'
+
+    @property
+    def is_active(self):
+        return self.active
+
+    def can(self, permission_name):
+        permission = Permission.query.filter_by(name=permission_name).first()
+        res = (permission is not None, self.role is not None, permission
+               in self.role.permissions)
+        return all(res)
 
 
 class Avatar(ModelMixin, db.Model):
     """用户资源"""
+    # __tablename__ = 'db_avatar'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     url = db.Column(db.String(256))
@@ -116,6 +144,7 @@ class Avatar(ModelMixin, db.Model):
 
 class Press(ModelMixin, db.Model):
     """出版社信息"""
+    # __tablename__ = 'db_press'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))  # 名称
     addr = db.Column(db.String(128))  # 地址
@@ -136,12 +165,13 @@ author_books = db.Table(
 
 class Book(ModelMixin, db.Model):
     """图书信息"""
+    # __tablename__ = 'db_book'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))  # 图书名称
     ISBN = db.Column(db.String(64))  # 图书编号
     translator = db.Column(db.String(64))  # 译者
     desc = db.Column(db.Text)  # 简介
-    stock = db.Column(db.Integer) # 库存
+    stock = db.Column(db.Integer)  # 库存
     press_id = db.Column(db.Integer, db.ForeignKey('press.id'))  # 出版社ID
     authors = db.relationship('Author',
                               secondary=author_books,
@@ -150,6 +180,7 @@ class Book(ModelMixin, db.Model):
 
 class BookMedia(ModelMixin, db.Model):
     """图书资源"""
+    # __tablename__ = 'db_bookmedia'
     id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.Integer)
     url = db.Column(db.String(128))
@@ -159,6 +190,7 @@ class BookMedia(ModelMixin, db.Model):
 
 class Author(ModelMixin, db.Model):
     """作者信息"""
+    # __tablename__ = 'db_author'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))  # 姓名
     sex = db.Column(db.String(4))  # 性别
@@ -169,6 +201,7 @@ class Author(ModelMixin, db.Model):
 
 class BorrowRead(ModelMixin, db.Model):
     """借阅信息"""
+    # __tablename__ = 'db_borrowread'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     book_id = db.Column(db.Integer)

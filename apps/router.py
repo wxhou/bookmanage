@@ -1,6 +1,6 @@
 from flask import Blueprint
 from core.extensions import docs
-from apps.views_auth import bp_auth, login, logout, UserView, UserEditView, upload_avatar
+from apps.views_auth import bp_auth, login, logout, active_user, UserView, UserEditView, upload_avatar
 from apps.views_books import bp_book, PressView, PressEditView, BookView, BookEditView, upload_book
 
 #bp_client
@@ -25,6 +25,9 @@ def register_docs_apps(app):
                   blueprint='client.bp_auth')
     docs.register(login, endpoint='login', blueprint='client.bp_auth')
     docs.register(logout, endpoint='logout', blueprint='client.bp_auth')
+    docs.register(active_user,
+                  endpoint='active_user',
+                  blueprint='client.bp_auth')
     docs.register(UserView, endpoint='User', blueprint='client.bp_auth')
     docs.register(UserEditView,
                   endpoint='UserEdit',

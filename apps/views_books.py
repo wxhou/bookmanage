@@ -6,32 +6,10 @@ from flask_apispec import doc, use_kwargs, marshal_with, MethodResource
 from core.utils import ErrCode, response_err, response_succ, allowed_file, random_filename, hash_filename
 from core.extensions import cache
 from .model import db, Press, Book, BookMedia
+from .serializer import PressSchema, BookSchema
 from .decorators import dc_login_required
 
 bp_book = Blueprint('bp_book', __name__)
-
-
-class PressSchema(Schema):
-    id = fields.Integer()
-    name = fields.String(required=True,
-                         validate=validate.Length(0, 64),
-                         data_key='press_name')
-    addr = fields.String(required=False,
-                         validate=validate.Length(0, 128),
-                         data_key='press_addr')
-
-
-class BookSchema(Schema):
-    id = fields.Integer()
-    name = fields.String(required=True, data_key='book_name')
-    ISBN = fields.String(required=True, data_key='book_isbn')
-    translator = fields.String(required=False)
-    desc = fields.String(required=False)
-    press = fields.Nested(PressSchema(only=('id', )))
-    images = fields.List(fields.Integer(), load_only=True)
-    audio = fields.Integer(load_only=True)
-    video = fields.Integer(load_only=True)
-
 
 @bp_book.post('/book/upload')
 @doc(tags=["图书管理"], summary="上传图书资料", type='file')

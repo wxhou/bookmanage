@@ -1,11 +1,13 @@
 import os
 import sqlalchemy
 from flask_apispec import doc, marshal_with, use_kwargs, MethodResource
-from flask import g, request, Blueprint, current_app
+from flask import g, request, Blueprint, current_app, url_for
 from marshmallow import Schema, fields, validate
 from core.utils import ErrCode, response_err, response_succ, allowed_file, random_filename, hash_filename
 from core.extensions import cache, docs
-from .model import db, User, Avatar
+from core.mails import send_register_email
+from .model import db, User, Avatar, Role
+from .serializer import UserSchema
 from .decorators import dc_login_required
 
 bp_auth = Blueprint('bp_auth', __name__)
@@ -57,39 +59,18 @@ def upload_avatar(**kwargs):
     return response_succ(data=result)
 
 
-class UserSchema(Schema):
-    """用户信息"""
-    id = fields.Integer(dump_only=True)
-    username = fields.String(required=False, validate=validate.Length(0, 128))
-    email = fields.String(required=True, validate=validate.Email())
-    phone = fields.String(required=True, validate=validate.Length(11))
-    avatar = fields.Integer(required=False)
-    password = fields.String(required=True,
-                             load_only=True,
-                             validate=[
-                                 validate.Length(8, 16),
-                                 validate.Regexp("^[a-zA-Z]\w{5,17}$")
-                             ])
-
-    avatar_url = fields.Method("get_avatar_url", dump_only=True)
-
-    def get_avatar_url(self, obj):
-        avatar_obj = Avatar.query.filter_by(id=obj.avatar_id,
-                                            status=0).one_or_none()
-        return avatar_obj.url if avatar_obj is not None else ''
-
-
 @bp_auth.post('/login')
 @doc(tags=["登录注册"], summary='登录')
 @use_kwargs(UserSchema(only=('email', 'password')))
 def login(**kwargs):
     """登录"""
     user = User.query.filter_by(email=kwargs.get('email')).one_or_none()
-    if user is not None and user.validate_password(kwargs.get("password")):
-        token, _ = user.generate_token()
+    if user is not None and user.validate_password(
+            kwargs.get("password")) and user.active:
+        token, expire = user.generate_token()
         user.token = token
         db.session.commit()
-        return response_succ(token=token)
+        return response_succ(token=token, expire=expire)
     return response_err(ErrCode.COMMON_LOGIN_ERROR, 'login error')
 
 
@@ -126,12 +107,31 @@ class UserView(MethodResource):
                         phone=kwargs.get('phone'),
                         avatar_id=kwargs.get('avatar'))
             user.password = kwargs.get('password')
+            user.role = Role.query.filter_by(name='Guest').first()
             db.session.add(user)
             db.session.commit()
         except sqlalchemy.exc.IntegrityError:
             return response_err(ErrCode.COMMON_REGISTER_ERROR,
                                 'user has exists')
+        token, _ = user.generate_token()
+        user.token = token
+        db.session.commit()
+        send_register_email(token, user.email)
         return response_succ(data=UserSchema().dump(user))
+
+
+@doc(tags=["用户管理"], summary="用户激活")
+@bp_auth.get('/user/active/<token>')
+def active_user(token):
+    """激活用户"""
+    if User.validate_token(token):
+        current_app.logger.info(g.current_user)
+        user = g.current_user
+        user.active = True
+        user.token = ''
+        db.session.commit()
+        return response_succ()
+    return response_err(ErrCode.COMMON_LOGIN_ERROR, 'register error')
 
 
 @doc(tags=['用户管理'])

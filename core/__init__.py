@@ -4,7 +4,7 @@ import sys
 from flask import g, Flask
 from flask_cors import CORS
 from settings import BASE_DIR
-from core.extensions import (db, migrate, cache, docs, limiter)
+from core.extensions import (db, mail, migrate, cache, docs, limiter)
 from core.commands import register_commands
 from core.errors import register_errors
 from core.logger import register_logger
@@ -43,6 +43,7 @@ def register_extensions(app):
     db.init_app(app)
     migrate.init_app(app=app)
     docs.init_app(app)
+    mail.init_app(app)
     limiter.init_app(app)
     cache.init_app(app, config=app.config['CACHE_CONFIG'])
     CORS(app)
