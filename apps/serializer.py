@@ -44,3 +44,6 @@ class BookSchema(Schema):
     images = fields.List(fields.Integer(), load_only=True)
     audio = fields.Integer(load_only=True)
     video = fields.Integer(load_only=True)
+    image_url = fields.String(dump_only=True)
+    audio_url = fields.String(dump_only=True)
+    video_url = fields.String(dump_only=True)

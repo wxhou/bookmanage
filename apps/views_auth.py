@@ -1,7 +1,7 @@
 import os
 import sqlalchemy
 from flask_apispec import doc, marshal_with, use_kwargs, MethodResource
-from flask import g, request, Blueprint, current_app, url_for
+from flask import g, request, Blueprint, current_app
 from marshmallow import Schema, fields, validate
 from core.utils import ErrCode, response_err, response_succ, allowed_file, random_filename, hash_filename
 from core.extensions import cache, docs

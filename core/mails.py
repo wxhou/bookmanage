@@ -1,5 +1,5 @@
 from threading import Thread
-from flask import current_app
+from flask import current_app, url_for
 from flask_mail import Message
 from .extensions import mail
 
