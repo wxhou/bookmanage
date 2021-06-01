@@ -3,13 +3,16 @@ import sqlalchemy
 from flask import g, request, Blueprint, current_app
 from marshmallow import Schema, fields, validate
 from flask_apispec import doc, use_kwargs, marshal_with, MethodResource
-from core.utils import ErrCode, response_err, response_succ, allowed_file, random_filename, hash_filename
+
+from core.response import ErrCode, response_err, response_succ
+from core.utils import allowed_file, random_filename
 from core.extensions import cache
-from .model import db, Press, Book, BookMedia
-from .serializer import PressSchema, BookSchema
+from .model import db, Press, Book, BookMedia, Author
+from .serializer import PressSchema, BookSchema, AuthorSchema
 from .decorators import dc_login_required
 
 bp_book = Blueprint('bp_book', __name__)
+
 
 @bp_book.post('/book/upload')
 @doc(tags=["图书管理"], summary="上传图书资料", type='file')
@@ -35,12 +38,16 @@ def upload_book(**kwargs):
         if not allowed_file('image', image_filename):
             return response_err(ErrCode.FILES_UPLOAD_ERROR,
                                 'file is not allow')
-        filename = random_filename(image_filename)
-        filepath = os.path.join(current_app.config['UPLOAD_IMAGE_FOLDER'],
-                                filename)
-        image.save(filepath)
-        book_media = BookMedia(url='/images/' + filename, mtype=1, ctype=ctype)
-        db.session.add(book_media)
+        hash_name = random_filename(image, image_filename)
+        media_obj = BookMedia.query.filter_by(uid=hash_name).one_or_none()
+        if media_obj is None:
+            filepath = os.path.join(current_app.config['UPLOAD_IMAGE_FOLDER'],
+                                    hash_name)
+            image.save(filepath)
+            book_media = BookMedia(
+                url='/images/' + hash_name, mtype=1, ctype=ctype)
+            db.session.add(book_media)
+        media_obj.status = 0
         db.session.commit()
         result['image'] = book_media.id
     if audio:
@@ -48,12 +55,16 @@ def upload_book(**kwargs):
         if not allowed_file('audio', audio_filename):
             return response_err(ErrCode.FILES_UPLOAD_ERROR,
                                 'file is not allow')
-        filename = random_filename(audio_filename)
-        filepath = os.path.join(current_app.config['UPLOAD_AUDIO_FOLDER'],
-                                filename)
-        audio.save(filepath)
-        book_media = BookMedia(url='/audios/' + filename, mtype=2, ctype=ctype)
-        db.session.add(book_media)
+        hash_name = random_filename(audio, audio_filename)
+        media_obj = BookMedia.query.filter_by(uid=hash_name).one_or_none()
+        if media_obj is None:
+            filepath = os.path.join(current_app.config['UPLOAD_AUDIO_FOLDER'],
+                                    hash_name)
+            audio.save(filepath)
+            book_media = BookMedia(
+                url='/audios/' + hash_name, mtype=2, ctype=ctype)
+            db.session.add(book_media)
+        media_obj.status = 0
         db.session.commit()
         result['audio'] = book_media.id
     if video:
@@ -236,3 +247,55 @@ class BookEditView(MethodResource):
         book.status = -1
         db.session.commit()
         return response_succ()
+
+
+@doc(tags=['作者管理'])
+class AuthorView(MethodResource):
+
+    @doc(summary='作者列表')
+    @marshal_with(AuthorSchema(many=True))
+    def get(self):
+        authors = Author.query.filter_by(status=0)
+        return response_succ(data=AuthorSchema(many=True).dump(authors))
+
+    @doc(summary='添加作者')
+    @use_kwargs(AuthorSchema(exclude=('id',)))
+    @marshal_with(AuthorSchema)
+    def post(self, **kwargs):
+        author = Author(**kwargs)
+        db.session.add(author)
+        db.session.commit()
+        return response_succ(AuthorSchema().dump(author))
+
+
+@doc(tags=['作者管理'])
+class AuthorEditView(MethodResource):
+
+    @doc(summary='获取作者信息')
+    @marshal_with(AuthorSchema)
+    def get(self, pk):
+        author = Author.query.filter_by(id=int(pk), status=0).one_or_none()
+        if author is None:
+            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+        return response_succ(AuthorSchema().dump(author))
+
+    @doc(summary='修改作者信息')
+    @use_kwargs(AuthorSchema(exclude=('id',), partial=True))
+    @marshal_with(AuthorSchema)
+    def put(self, pk, **kwargs):
+        author = Author.query.filter_by(
+            id=kwargs.get('id'), status=0).one_or_none()
+        if author is None:
+            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+        for k, v in kwargs.items():
+            setattr(author, k, v)
+        db.session.commit()
+        return response_succ(AuthorSchema().dump(author))
+
+    @doc(summary='删除作者')
+    @marshal_with(None)
+    def delete(self, pk):
+        author = Author.query.filter_by(id=int(pk), status=0).one_or_none()
+        if author is None:
+            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+        return response_succ(AuthorSchema().dump(author))

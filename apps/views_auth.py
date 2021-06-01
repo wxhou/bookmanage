@@ -3,9 +3,12 @@ import sqlalchemy
 from flask_apispec import doc, marshal_with, use_kwargs, MethodResource
 from flask import g, request, Blueprint, current_app
 from marshmallow import Schema, fields, validate
-from core.utils import ErrCode, response_err, response_succ, allowed_file, random_filename, hash_filename
+
 from core.extensions import cache, docs
 from core.mails import send_register_email
+from core.response import ErrCode, response_err, response_succ
+from core.utils import allowed_file, random_filename
+
 from .model import db, User, Avatar, Role
 from .serializer import UserSchema
 from .decorators import dc_login_required
@@ -35,27 +38,35 @@ def upload_avatar(**kwargs):
         if not allowed_file('image', image_filename):
             return response_err(ErrCode.FILES_UPLOAD_ERROR,
                                 'file is not allow')
-        filename = random_filename(image_filename)
-        filepath = os.path.join(current_app.config['UPLOAD_IMAGE_FOLDER'],
-                                filename)
-        image.save(filepath)
-        avatar = Avatar(url='/images/' + filename, mtype=1, ctype=ctype)
-        db.session.add(avatar)
+        hash_name = random_filename(image, image_filename)
+        avatar_obj = Avatar.query.filter_by(uid=hash_name).one_or_none()
+        if avatar_obj is None:
+            filepath = os.path.join(current_app.config['UPLOAD_IMAGE_FOLDER'],
+                                    hash_name)
+            image.save(filepath)
+            avatar_obj = Avatar(url='/images/' + hash_name,
+                                mtype=1, uid=hash_name, ctype=ctype)
+            db.session.add(avatar_obj)
+        avatar_obj.status = 0
         db.session.commit()
-        result['image'] = avatar.id
+        result['image'] = avatar_obj.id
     if video:
         video_filename = video.filename.strip('" ')
         if not allowed_file('video', video_filename):
             return response_err(ErrCode.FILES_UPLOAD_ERROR,
                                 'file is not allow')
-        filename = random_filename(video_filename)
-        filepath = os.path.join(current_app.config['UPLOAD_VIDEO_FOLDER'],
-                                filename)
-        video.save(filepath)
-        avatar = Avatar(url='/videos/' + filename, mtype=3, ctype=ctype)
-        db.session.add(avatar)
+        hash_name = random_filename(video, video_filename)
+        avatar_obj = Avatar.query.filter_by(uid=hash_name).one_or_none()
+        if avatar_obj is None:
+            filepath = os.path.join(current_app.config['UPLOAD_VIDEO_FOLDER'],
+                                    hash_name)
+            video.save(filepath)
+            avatar_obj = Avatar(url='/videos/' + hash_name,
+                                mtype=3, uid=hash_name, ctype=ctype)
+            db.session.add(avatar_obj)
+        avatar_obj.status = 0
         db.session.commit()
-        result['video'] = avatar.id
+        result['video'] = avatar_obj.id
     return response_succ(data=result)
 
 

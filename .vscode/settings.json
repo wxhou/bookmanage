@@ -1,4 +1,4 @@
 {
-    "python.languageServer": "Jedi",
-    "python.formatting.provider": "yapf"
+    "python.formatting.provider": "autopep8",
+    "python.languageServer": "Jedi"
 }
