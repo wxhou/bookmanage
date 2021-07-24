@@ -1,7 +1,8 @@
 import traceback
 from flask import current_app
+from werkzeug.http import HTTP_STATUS_CODES
 from werkzeug.exceptions import HTTPException, InternalServerError
-from .utils import response_err, ErrCode, HTTP_STATUS_CODES
+from .response import ErrCode, response_err, response_succ
 
 
 def register_errors(app):
@@ -31,7 +32,7 @@ def register_errors(app):
     def internal_server_error(err):
         current_app.logger.critical(traceback.format_exc())
         return response_err(500, HTTP_STATUS_CODES[500], err.code)
-
+    
     @app.errorhandler(Exception)
     def unknown_error(err):
         current_app.logger.critical(traceback.format_exc())

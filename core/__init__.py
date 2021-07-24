@@ -6,7 +6,7 @@ from flask_cors import CORS
 from settings import BASE_DIR
 from core.extensions import (db, mail, migrate, cache, docs, limiter)
 from core.commands import register_commands
-from core.errors import register_errors
+from core.exceptions import register_errors
 from core.logger import register_logger
 
 

@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, validate
-from .model import User, Avatar, Book, Press
+from .model import User, Avatar, Book, Press, Author
 
 
 class UserSchema(Schema):
@@ -47,3 +47,12 @@ class BookSchema(Schema):
     image_url = fields.String(dump_only=True)
     audio_url = fields.String(dump_only=True)
     video_url = fields.String(dump_only=True)
+    author = fields.Nested(lambda: AuthorSchema(exclude=("books",)))
+
+
+class AuthorSchema(Schema):
+    id = fields.Integer()
+    name = fields.String(required=True, validate=validate.Length(0, 64))
+    sex = fields.String(
+        required=True, validate=validate.OneOf(['male', 'female']))
+    books = fields.List(fields.Nested(BookSchema(exclude=('author',))))

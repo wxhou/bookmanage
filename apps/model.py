@@ -136,6 +136,7 @@ class Avatar(ModelMixin, db.Model):
     """用户资源"""
     # __tablename__ = 'db_avatar'
     id = db.Column(db.Integer, primary_key=True)
+    uid = db.Column(db.String(64), index=True, nullable=False, unique=True)
     user_id = db.Column(db.Integer)
     url = db.Column(db.String(256))
     mtype = db.Column(db.Integer)  # 资源类型(image 1/audio 2/video 3)

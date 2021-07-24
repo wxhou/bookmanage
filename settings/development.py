@@ -23,7 +23,7 @@ ALLOWED_VIDEO_EXTENSIONS = {'mp4'}
 # 分页数
 PAGE_PER_NUM = 15
 
-#cache_redis
+# cache_redis
 CACHE_CONFIG = {
     'CACHE_TYPE': "redis",  # Flask-Caching related configs
     'CACHE_REDIS_HOST': '127.0.0.1',
@@ -38,7 +38,13 @@ SCHEDULER_API_ENABLED = True
 # SWAGGER_2 文档配置
 # https://swagger.io/specification/v2/
 # https://editor.swagger.io/
+
+
+def resolver(schema):
+    return None
+
+
 APISPEC_SPEC = APISpec(title='books',
                        version='V1',
                        openapi_version='2.0',
-                       plugins=[MarshmallowPlugin()])
+                       plugins=[MarshmallowPlugin(schema_name_resolver=resolver)])

@@ -1,6 +1,6 @@
 from functools import wraps
 from flask import request, current_app
-from core.utils import ErrCode, response_err, response_succ
+from core.response import ErrCode, response_err, response_succ
 from .model import User
 
 
