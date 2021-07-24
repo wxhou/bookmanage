@@ -71,7 +71,7 @@ def login(**kwargs):
         user.token = token
         db.session.commit()
         return response_succ(token=token, expire=expire)
-    return response_err(ErrCode.COMMON_LOGIN_ERROR, 'login error')
+    return response_err(ErrCode.COMMON_LOGIN_ERROR, 'username/password error')
 
 
 @bp_auth.get('/logout')
