@@ -1,7 +1,7 @@
 from flask import Blueprint
-from core.extensions import docs
-from apps.views_auth import bp_auth, login, logout, active_user, UserView, UserEditView, upload_avatar
-from apps.views_books import bp_book, PressView, PressEditView, BookView, BookEditView, upload_book
+from app.extensions import docs
+from apps_book.views_auth import bp_auth, login, logout, active_user, UserView, UserEditView, upload_avatar
+from apps_book.views_books import bp_book, PressView, PressEditView, BookView, BookEditView, upload_book
 
 #bp_client
 bp_client = Blueprint('client', __name__)
@@ -19,7 +19,7 @@ bp_book.add_url_rule('/', view_func=BookView.as_view('Book'))
 bp_book.add_url_rule('/<int:pk>', view_func=BookEditView.as_view('BookEdit'))
 
 
-def register_docs_apps(app):
+def register_docs_apps():
     docs.register(upload_avatar,
                   endpoint='upload_avatar',
                   blueprint='client.bp_auth')

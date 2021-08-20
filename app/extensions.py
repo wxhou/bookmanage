@@ -1,4 +1,5 @@
 from sqlalchemy import text
+from flask_cors import CORS
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -10,11 +11,11 @@ from flask_apispec.extension import FlaskApiSpec
 db = SQLAlchemy()
 cache = Cache()
 mail = Mail()
+cors = CORS()
 migrate = Migrate(db=db)
 docs = FlaskApiSpec(document_options=False)  # 为False时不显示options方法
 limiter = Limiter(key_func=get_remote_address)
 
 
 def raw_sql(_sql):
-    result = db.engine.execute(text(_sql))
-    return result
+    return db.engine.execute(text(_sql))

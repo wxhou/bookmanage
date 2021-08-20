@@ -17,8 +17,7 @@ def send_mail(subject, to: list, html):
     return thr
 
 
-def send_register_email(token, email):
-    register_url = url_for('.active_user', token=token, _external=True)
+def send_register_email(register_url, email):
     send_mail(subject="激活链接",
               to=[email],
               html="""

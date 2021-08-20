@@ -40,7 +40,7 @@ class BookSchema(Schema):
     ISBN = fields.String(required=True, data_key='book_isbn')
     translator = fields.String(required=False)
     desc = fields.String(required=False)
-    press = fields.Nested(PressSchema(only=('id', )))
+    press = fields.Nested(PressSchema(only=('id',)))
     images = fields.List(fields.Integer(), load_only=True)
     audio = fields.Integer(load_only=True)
     video = fields.Integer(load_only=True)

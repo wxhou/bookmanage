@@ -32,12 +32,12 @@ def random_filename(stream, filename):
     for line in stream:
         md5.update(line)
     ext = os.path.splitext(old_filename)[1]
-    new_filename = md5.hexdigest() + ext
+    new_filename = md5.hexdigest() + ext.lower()
     return new_filename
 
 
 if __name__ == '__main__':
-    print(hash_filename(
+    print(random_filename(
         "/Users/hoou/VScode/bookmanage/media/images/2f815da28f7b4db28389e48d64091510.jpg"))
-    print(hash_filename(
+    print(random_filename(
         "/Users/hoou/VScode/bookmanage/media/images/2f815da28f7b4db28389e48d64091596.jpg"))

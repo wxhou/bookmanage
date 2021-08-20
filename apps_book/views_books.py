@@ -1,12 +1,11 @@
 import os
-import sqlalchemy
 from flask import g, request, Blueprint, current_app
-from marshmallow import Schema, fields, validate
+from marshmallow import fields, validate
 from flask_apispec import doc, use_kwargs, marshal_with, MethodResource
 
-from core.response import ErrCode, response_err, response_succ
-from core.utils import allowed_file, random_filename
-from core.extensions import cache
+from app.response import ErrCode, response_err, response_succ
+from app.utils import allowed_file, random_filename
+from app.extensions import cache
 from .model import db, Press, Book, BookMedia, Author
 from .serializer import PressSchema, BookSchema, AuthorSchema
 from .decorators import dc_login_required

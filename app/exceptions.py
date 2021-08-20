@@ -32,7 +32,7 @@ def register_errors(app):
     def internal_server_error(err):
         current_app.logger.critical(traceback.format_exc())
         return response_err(500, HTTP_STATUS_CODES[500], err.code)
-    
+
     @app.errorhandler(Exception)
     def unknown_error(err):
         current_app.logger.critical(traceback.format_exc())

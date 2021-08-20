@@ -1,14 +1,12 @@
 import os
-import sqlalchemy
 from flask_apispec import doc, marshal_with, use_kwargs, MethodResource
-from flask import g, request, Blueprint, current_app
-from marshmallow import Schema, fields, validate
+from flask import g, request, Blueprint, current_app, url_for
+from marshmallow import fields
 
-from core.extensions import cache, docs
-from core.mails import send_register_email
-from core.response import ErrCode, response_err, response_succ
-from core.utils import allowed_file, random_filename
-
+from app.extensions import cache, docs
+from app.mails import send_register_email
+from app.response import ErrCode, response_err, response_succ
+from app.utils import allowed_file, random_filename
 from .model import db, User, Avatar, Role
 from .serializer import UserSchema
 from .decorators import dc_login_required
@@ -102,6 +100,7 @@ def logout():
 class UserView(MethodResource):
     """用户管理
     """
+
     @doc(summary="用户列表")
     @marshal_with(UserSchema(many=True))
     def get(self, **kwargs):
@@ -112,22 +111,25 @@ class UserView(MethodResource):
     @use_kwargs(UserSchema)
     @marshal_with(UserSchema)
     def post(self, **kwargs):
-        try:
-            user = User(username=kwargs.get('username'),
-                        email=kwargs.get('email'),
-                        phone=kwargs.get('phone'),
-                        avatar_id=kwargs.get('avatar'))
-            user.password = kwargs.get('password')
-            user.role = Role.query.filter_by(name='Guest').first()
-            db.session.add(user)
-            db.session.commit()
-        except sqlalchemy.exc.IntegrityError:
+        email = kwargs.get('email')
+        user = User.query.filter_by(email=email).one_or_none()
+        if email and user is not None:
             return response_err(ErrCode.COMMON_REGISTER_ERROR,
                                 'user has exists')
+        user = User(username=kwargs.get('username'),
+                    email=email,
+                    phone=kwargs.get('phone'),
+                    avatar_id=kwargs.get('avatar'))
+        user.password = kwargs.get('password')
+        user.role = Role.query.filter_by(name='Guest').first()
+        db.session.add(user)
+        db.session.commit()
         token, _ = user.generate_token()
         user.token = token
         db.session.commit()
-        send_register_email(token, user.email)
+        # send_mail
+        register_url = url_for('.active_user', token=token, _external=True)
+        send_register_email(register_url, user.email)
         return response_succ(data=UserSchema().dump(user))
 
 
@@ -149,6 +151,7 @@ def active_user(token):
 class UserEditView(MethodResource):
     """用户管理
     """
+
     @doc(summary="用户详情")
     @use_kwargs({'email': fields.Email()}, location='query')
     @marshal_with(UserSchema)
@@ -161,7 +164,7 @@ class UserEditView(MethodResource):
 
     @doc(summary="修改用户信息")
     @dc_login_required
-    @use_kwargs(UserSchema(exclude=('email', ), partial=True))
+    @use_kwargs(UserSchema(exclude=('email',), partial=True))
     @marshal_with(UserSchema)
     def put(self, pk, **kwargs):
         user = User.query.filter_by(id=int(pk), status=0).one_or_none()

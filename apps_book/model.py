@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 from datetime import datetime
-from flask import g, request, current_app
+from flask import g, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import BadTimeSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from core.extensions import db, cache
+from app.extensions import db
 
 roles_permissions = db.Table(
     'roles_permissions',
@@ -14,7 +14,7 @@ roles_permissions = db.Table(
 
 
 class Permission(db.Model):
-    # __tablename__ = 'db_permission'
+    # __tablename__ = 'book_permission'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), unique=True)
     roles = db.relationship('Role',
@@ -24,7 +24,7 @@ class Permission(db.Model):
 
 class Role(db.Model):
     """角色"""
-    # __tablename__ = 'db_role'
+    # __tablename__ = 'book_role'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), unique=True, index=True)
     users = db.relationship(
@@ -34,31 +34,6 @@ class Role(db.Model):
     permissions = db.relationship('Permission',
                                   secondary=roles_permissions,
                                   back_populates='roles')
-
-    @staticmethod
-    def init_role():
-        roles_permissions_map = {
-            'Guest': ['SEE'],
-            'User': ['LOGIN', 'SEE', 'LEASE'],
-            'VIP': ['LOGIN', 'SEE', 'LEASE', 'BUY'],
-            'Author': ['LOGIN', 'SEE', 'LEASE', 'BUY', 'WRITE', 'UPLOAD'],
-            'Admin':
-            ['LOGIN', 'SEE', 'LEASE', 'BUY', 'WRITE', 'UPLOAD', 'ADMIN']
-        }
-        for role_name in roles_permissions_map:
-            role = Role.query.filter_by(name=role_name).first()
-            if role is None:
-                role = Role(name=role_name)
-            db.session.add(role)
-            role.permissions = []
-            for permission_name in roles_permissions_map[role_name]:
-                permission = Permission.query.filter_by(
-                    name=permission_name).first()
-                if permission is None:
-                    permission = Permission(name=permission_name)
-                db.session.add(permission)
-                role.permissions.append(permission)
-        db.session.commit()
 
 
 class ModelMixin(object):
@@ -72,7 +47,7 @@ class ModelMixin(object):
 
 class User(ModelMixin, db.Model):
     """用户信息"""
-    # __tablename__ = 'db_user'
+    # __tablename__ = 'book_user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), index=True)
     email = db.Column(db.String(128), unique=True, nullable=False)
@@ -134,7 +109,7 @@ class User(ModelMixin, db.Model):
 
 class Avatar(ModelMixin, db.Model):
     """用户资源"""
-    # __tablename__ = 'db_avatar'
+    # __tablename__ = 'book_avatar'
     id = db.Column(db.Integer, primary_key=True)
     uid = db.Column(db.String(64), index=True, nullable=False, unique=True)
     user_id = db.Column(db.Integer)
@@ -145,7 +120,7 @@ class Avatar(ModelMixin, db.Model):
 
 class Press(ModelMixin, db.Model):
     """出版社信息"""
-    # __tablename__ = 'db_press'
+    # __tablename__ = 'book_press'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))  # 名称
     addr = db.Column(db.String(128))  # 地址
@@ -166,7 +141,7 @@ author_books = db.Table(
 
 class Book(ModelMixin, db.Model):
     """图书信息"""
-    # __tablename__ = 'db_book'
+    # __tablename__ = 'book'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))  # 图书名称
     ISBN = db.Column(db.String(64))  # 图书编号
@@ -181,7 +156,7 @@ class Book(ModelMixin, db.Model):
 
 class BookMedia(ModelMixin, db.Model):
     """图书资源"""
-    # __tablename__ = 'db_bookmedia'
+    # __tablename__ = 'book_media'
     id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.Integer)
     url = db.Column(db.String(128))
@@ -191,7 +166,7 @@ class BookMedia(ModelMixin, db.Model):
 
 class Author(ModelMixin, db.Model):
     """作者信息"""
-    # __tablename__ = 'db_author'
+    # __tablename__ = 'book_author'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))  # 姓名
     sex = db.Column(db.String(4))  # 性别
@@ -202,7 +177,7 @@ class Author(ModelMixin, db.Model):
 
 class BorrowRead(ModelMixin, db.Model):
     """借阅信息"""
-    # __tablename__ = 'db_borrowread'
+    # __tablename__ = 'book_borrowread'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     book_id = db.Column(db.Integer)
