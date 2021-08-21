@@ -4,12 +4,12 @@ from flask import g, request, Blueprint, current_app, url_for
 from marshmallow import fields
 
 from app.extensions import cache, docs
-from app.mails import send_register_email
 from app.response import ErrCode, response_err, response_succ
 from app.utils import allowed_file, random_filename
 from .model import db, User, Avatar, Role
 from .serializer import UserSchema
 from .decorators import dc_login_required
+from .tasks import send_register_email
 
 bp_auth = Blueprint('bp_auth', __name__)
 
