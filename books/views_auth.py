@@ -129,7 +129,7 @@ class UserView(MethodResource):
         db.session.commit()
         # send_mail
         register_url = url_for('.active_user', token=token, _external=True)
-        send_register_email(register_url, user.email)
+        send_register_email.delay(register_url, user.email)
         return response_succ(data=UserSchema().dump(user))
 
 

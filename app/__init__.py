@@ -6,18 +6,19 @@ from logging.handlers import RotatingFileHandler
 import click
 from flask import Flask
 from settings.base import BASE_DIR
-from app.extensions import (db, cors, mail, migrate, cache, docs, limiter)
+from app.extensions import (db, cors, mail, migrate,
+                            cache, docs, limiter, register_celery)
 from app.exceptions import register_errors
 
 
-def create_app(env=None):
-    if env is None:
-        env = os.getenv('FLASK_ENV', 'development')
+def create_app(**kwargs):
+    env = kwargs.get('env') or os.getenv('FLASK_ENV', 'development')
     app = Flask(__name__)
     print("use in: ", env)
-    pyfile = os.path.join(BASE_DIR, 'settings', env + '.py')
-    app.config.from_pyfile(pyfile)
+    env_file = os.path.join(BASE_DIR, 'settings', env + '.py')
+    app.config.from_pyfile(env_file)
     register_extensions(app)
+    register_celery(kwargs.get('celery'), app)
     register_logger(app)
     register_commands(app)
     register_errors(app)
@@ -27,12 +28,12 @@ def create_app(env=None):
 
 
 def register_blueprints(app):
-    from apps_book.router import bp_client
+    from books.router import bp_client
     app.register_blueprint(bp_client, url_prefix='/client')
 
 
 def register_docs():
-    from apps_book.router import register_docs_apps
+    from books.router import register_docs_apps
     register_docs_apps()
 
 
@@ -77,7 +78,7 @@ def register_logger(app):
 
 
 def register_commands(app):
-    from apps_book.model import User, Role, Permission
+    from books.model import User, Role, Permission
 
     @app.cli.command()
     @click.option('--drop', is_flag=True, help='Create after drop.')

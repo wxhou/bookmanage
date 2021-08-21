@@ -1,7 +1,7 @@
 from flask import Blueprint
 from app.extensions import docs
-from apps_book.views_auth import bp_auth, login, logout, active_user, UserView, UserEditView, upload_avatar
-from apps_book.views_books import bp_book, PressView, PressEditView, BookView, BookEditView, upload_book
+from books.views_auth import bp_auth, login, logout, active_user, UserView, UserEditView, upload_avatar
+from books.views_books import bp_book, PressView, PressEditView, BookView, BookEditView, upload_book
 
 #bp_client
 bp_client = Blueprint('client', __name__)
