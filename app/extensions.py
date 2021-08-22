@@ -1,6 +1,8 @@
+from flask import request
 from sqlalchemy import text
 from flask_cors import CORS
 from flask_mail import Mail
+from flask_babel import Babel
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_caching import Cache
@@ -17,6 +19,8 @@ cors = CORS()
 migrate = Migrate(db=db)
 docs = FlaskApiSpec(document_options=False)  # 为False时不显示options方法
 limiter = Limiter(key_func=get_remote_address)
+babel = Babel()
+
 
 def resolver(schema):
     return None
@@ -37,3 +41,11 @@ def register_celery(celery, app):
                 return self.run(*args, **kwargs)
 
     celery.Task = ContextTask
+
+
+@babel.localeselector
+def get_locale():
+    # otherwise try to guess the language from the user accept
+    # header the browser transmits.  We support de/fr/en in this
+    # example.  The best match wins.
+    return request.accept_languages.best_match(['zh'])

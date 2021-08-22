@@ -2,11 +2,13 @@ from flask import Blueprint
 from app.extensions import docs
 from books.views_auth import bp_auth, login, logout, active_user, UserView, UserEditView, upload_avatar
 from books.views_books import bp_book, PressView, PressEditView, BookView, BookEditView, upload_book
+from books.views_demo import bp_demo, hello
 
-#bp_client
+# bp_client
 bp_client = Blueprint('client', __name__)
 bp_client.register_blueprint(bp_auth, url_prefix='/auth')
 bp_client.register_blueprint(bp_book, url_prefix='/book')
+bp_client.register_blueprint(bp_demo, url_prefix='/demo')
 # bp_auth
 bp_auth.add_url_rule('/user', view_func=UserView.as_view('User'))
 bp_auth.add_url_rule('/user/<int:pk>',
@@ -17,6 +19,7 @@ bp_book.add_url_rule('/press/<int:pk>',
                      view_func=PressEditView.as_view('PressEdit'))
 bp_book.add_url_rule('/', view_func=BookView.as_view('Book'))
 bp_book.add_url_rule('/<int:pk>', view_func=BookEditView.as_view('BookEdit'))
+# bp_demo
 
 
 def register_docs_apps():
@@ -43,3 +46,4 @@ def register_docs_apps():
     docs.register(BookEditView,
                   endpoint='BookEdit',
                   blueprint='client.bp_book')
+    docs.register(hello, endpoint='hello', blueprint='client.bp_demo')

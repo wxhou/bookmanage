@@ -5,7 +5,7 @@ from app.extensions import apispec_plugin
 DEBUG = True
 DB_SERVER = os.getenv("DB_SERVER", "127.0.0.1")
 SECRET_KEY = "7fd2ad44-b91a-11eb-a15a-98e0d9885a43"
-
+BABEL_DEFAULT_LOCALE = 'zh'
 # mysql
 SQLALCHEMY_DATABASE_URI = "mysql://root:root1234@{}/db_booklibray".format(DB_SERVER)
 SQLALCHEMY_TRACK_MODIFICATIONS = False

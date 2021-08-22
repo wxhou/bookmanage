@@ -1,5 +1,6 @@
 import traceback
 from flask import current_app
+from flask_babel import lazy_gettext as _
 from werkzeug.http import HTTP_STATUS_CODES
 from werkzeug.exceptions import HTTPException, InternalServerError
 from common.response import ErrCode, response_err, response_succ
@@ -15,13 +16,14 @@ def register_errors(app):
     @app.errorhandler(400)
     def request_error(err):
         """ValidationErrorRequest"""
-        headers = err.data.get("headers", None)
+        headers = err.data.get("headers")
         message = err.data.get('messages', ["Invalid request."])
+        res = response_err(ErrCode.COMMON_PARAMS_ERROR,
+                           (message.get('json')), err.code, headers)
         if headers:
-            return response_err(ErrCode.COMMON_PARAMS_ERROR,
-                                message.get('json'), err.code, headers)
-        return response_err(ErrCode.COMMON_PARAMS_ERROR, message.get('json'),
-                            err.code)
+            for k, v in headers.items():
+                err.headers[k] = v
+        return res
 
     @app.errorhandler(429)
     def to_many_request(err):

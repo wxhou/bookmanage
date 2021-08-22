@@ -6,7 +6,7 @@ from logging.handlers import RotatingFileHandler
 import click
 from flask import Flask
 from settings.base import BASE_DIR
-from app.extensions import (db, cors, mail, migrate,
+from app.extensions import (db, cors, mail, migrate, babel,
                             cache, docs, limiter, register_celery)
 from app.errors import register_errors
 
@@ -40,6 +40,7 @@ def register_docs():
 def register_extensions(app):
     db.init_app(app)
     migrate.init_app(app=app)
+    babel.init_app(app)
     docs.init_app(app)
     mail.init_app(app)
     limiter.init_app(app)
