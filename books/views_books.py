@@ -3,11 +3,11 @@ from flask import g, request, Blueprint, current_app
 from marshmallow import fields, validate
 from flask_apispec import doc, use_kwargs, marshal_with, MethodResource
 
-from app.response import ErrCode, response_err, response_succ
+from common.response import ErrCode, response_err, response_succ
 from app.utils import allowed_file, random_filename
 from app.extensions import cache
 from .model import db, Press, Book, BookMedia, Author
-from .serializer import PressSchema, BookSchema, AuthorSchema
+from .serializer import PressSchema, BookSchema, BookMediaSchema, AuthorSchema
 from .decorators import dc_login_required
 
 bp_book = Blueprint('bp_book', __name__)
@@ -15,14 +15,7 @@ bp_book = Blueprint('bp_book', __name__)
 
 @bp_book.post('/book/upload')
 @doc(tags=["图书管理"], summary="上传图书资料", type='file')
-@use_kwargs(
-    {
-        'image': fields.Raw(),
-        'video': fields.Raw(),
-        'audio': fields.Raw(),
-        'ctype': fields.Int(default=1)
-    },
-    location='files')
+@use_kwargs(BookMediaSchema, location='files')
 @marshal_with(schema=None, code=200, description="SUCCESS")
 def upload_book(**kwargs):
     image = request.files.get('image')

@@ -1,6 +1,6 @@
 from settings.base import *
 from apispec import APISpec
-from apispec.ext.marshmallow import MarshmallowPlugin
+from app.extensions import apispec_plugin
 
 DEBUG = True
 DB_SERVER = os.getenv("DB_SERVER", "127.0.0.1")
@@ -42,10 +42,7 @@ SCHEDULER_API_ENABLED = True
 # SWAGGER_2 文档配置
 # https://swagger.io/specification/v2/
 # https://editor.swagger.io/
-def resolver(schema):
-    return None
-
 APISPEC_SPEC = APISpec(title='books',
                        version='V1',
                        openapi_version='2.0',
-                       plugins=[MarshmallowPlugin(schema_name_resolver=resolver)])
+                       plugins=[apispec_plugin])

@@ -2,7 +2,7 @@ import traceback
 from flask import current_app
 from werkzeug.http import HTTP_STATUS_CODES
 from werkzeug.exceptions import HTTPException, InternalServerError
-from .response import ErrCode, response_err, response_succ
+from common.response import ErrCode, response_err, response_succ
 
 
 def register_errors(app):

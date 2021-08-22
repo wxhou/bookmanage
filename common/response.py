@@ -19,9 +19,10 @@ class ErrCode(object):
 
 def response_err(code, msg='', *args):
     """错误返回"""
+    res = jsonify({'errcode': code, 'errmsg': msg})
     if args:
-        return jsonify({'errcode': code, 'errmsg': msg}), *args
-    return jsonify({'errcode': code, 'errmsg': msg})
+        return res, *args
+    return res
 
 
 def response_succ(result=None, cookies=None, **kwargs):
@@ -31,9 +32,6 @@ def response_succ(result=None, cookies=None, **kwargs):
     else:
         results = deepcopy(result)
     for k, v in kwargs.items():
-        if k in ['code', 'errcode']:
-            results['errcode'] = v
-            continue
         results[k] = v
     res = jsonify(results)
     if cookies:

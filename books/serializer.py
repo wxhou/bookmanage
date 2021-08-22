@@ -1,5 +1,12 @@
-from marshmallow import Schema, fields, validate
+from common.schema import Schema, fields, validate, FileField, PageSchema
 from .model import User, Avatar, Book, Press, Author
+
+
+class AvatarsSchema(Schema):
+    """用户头像"""
+    image = FileField()
+    video = FileField()
+    ctype = fields.Str(default=1)
 
 
 class UserSchema(Schema):
@@ -32,6 +39,13 @@ class PressSchema(Schema):
     addr = fields.String(required=False,
                          validate=validate.Length(0, 128),
                          data_key='press_addr')
+
+
+class BookMediaSchema(Schema):
+    image = FileField()
+    audio = FileField()
+    video = FileField()
+    ctype: fields.Int(default=1)
 
 
 class BookSchema(Schema):

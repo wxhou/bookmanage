@@ -4,10 +4,11 @@ from flask import g, request, Blueprint, current_app, url_for
 from marshmallow import fields
 
 from app.extensions import cache, docs
-from app.response import ErrCode, response_err, response_succ
 from app.utils import allowed_file, random_filename
+from common.response import ErrCode, response_err, response_succ
+
 from .model import db, User, Avatar, Role
-from .serializer import UserSchema
+from .serializer import AvatarsSchema, UserSchema
 from .decorators import dc_login_required
 from .tasks import send_register_email
 
@@ -16,13 +17,7 @@ bp_auth = Blueprint('bp_auth', __name__)
 
 @bp_auth.post('/avatar/upload')
 @doc(tags=["用户管理"], summary="上传用户资料", type='file')
-@use_kwargs(
-    {
-        'image': fields.Raw(),
-        'video': fields.Raw(),
-        'ctype': fields.Str(default=1)
-    },
-    location='files')
+@use_kwargs(AvatarsSchema, location='files')
 @marshal_with(schema=None, code=200, description='all good here')
 def upload_avatar(**kwargs):
     image = request.files.get('image')

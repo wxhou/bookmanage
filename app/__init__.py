@@ -8,7 +8,7 @@ from flask import Flask
 from settings.base import BASE_DIR
 from app.extensions import (db, cors, mail, migrate,
                             cache, docs, limiter, register_celery)
-from app.exceptions import register_errors
+from app.errors import register_errors
 
 
 def create_app(**kwargs):

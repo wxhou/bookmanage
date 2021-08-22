@@ -3,9 +3,10 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # upload
-UPLOAD_IMAGE_FOLDER = os.path.join(BASE_DIR, 'media', 'images')
-UPLOAD_AUDIO_FOLDER = os.path.join(BASE_DIR, 'media', 'audios')
-UPLOAD_VIDEO_FOLDER = os.path.join(BASE_DIR, 'media', 'audios')
+UPLOAD_MEDIA_FOLDER = os.path.join(BASE_DIR, 'media')
+UPLOAD_IMAGE_FOLDER = os.path.join(UPLOAD_MEDIA_FOLDER, 'images')
+UPLOAD_AUDIO_FOLDER = os.path.join(UPLOAD_MEDIA_FOLDER, 'audios')
+UPLOAD_VIDEO_FOLDER = os.path.join(UPLOAD_MEDIA_FOLDER, 'audios')
 
 # logger
 LOGGER_LEVEL = 'DEBUG'
