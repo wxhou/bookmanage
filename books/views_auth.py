@@ -4,12 +4,12 @@ from flask import g, request, Blueprint, current_app, url_for
 from marshmallow import fields
 
 from app.extensions import cache, docs
+from app.decorators import dc_login_required
 from app.utils import allowed_file, random_filename
 from common.response import ErrCode, response_err, response_succ
 
 from .model import db, User, Avatar, Role
 from .serializer import AvatarsSchema, UserSchema
-from .decorators import dc_login_required
 from .tasks import send_register_email
 
 bp_auth = Blueprint('bp_auth', __name__)
@@ -90,8 +90,8 @@ def logout():
     db.session.commit()
     return response_succ()
 
-
 @doc(tags=['用户管理'])
+@bp_auth.route('/user', methods=["GET", "POST"])
 class UserView(MethodResource):
     """用户管理
     """
@@ -143,6 +143,7 @@ def active_user(token):
 
 
 @doc(tags=['用户管理'])
+@bp_auth.route('/user/<int:pk>', methods=["GET", 'POST', 'DELETE'])
 class UserEditView(MethodResource):
     """用户管理
     """
@@ -161,7 +162,7 @@ class UserEditView(MethodResource):
     @dc_login_required
     @use_kwargs(UserSchema(exclude=('email',), partial=True))
     @marshal_with(UserSchema)
-    def put(self, pk, **kwargs):
+    def post(self, pk, **kwargs):
         user = User.query.filter_by(id=int(pk), status=0).one_or_none()
         if user is None:
             return response_err(ErrCode.QUERY_NO_DATA, 'user not exists')

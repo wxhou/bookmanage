@@ -34,7 +34,7 @@ def response_succ(result=None, cookies=None, **kwargs):
     for k, v in kwargs.items():
         results[k] = v
     res = jsonify(results)
-    if cookies:
+    if cookies is not None:
         for k, v in cookies.items():
             res.set_cookie(k, v)
     return res

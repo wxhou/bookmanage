@@ -5,10 +5,10 @@ from flask_apispec import doc, use_kwargs, marshal_with, MethodResource
 
 from common.response import ErrCode, response_err, response_succ
 from app.utils import allowed_file, random_filename
+from app.decorators import dc_login_required
 from app.extensions import cache
 from .model import db, Press, Book, BookMedia, Author
 from .serializer import PressSchema, BookSchema, BookMediaSchema, AuthorSchema
-from .decorators import dc_login_required
 
 bp_book = Blueprint('bp_book', __name__)
 
@@ -76,6 +76,7 @@ def upload_book(**kwargs):
 
 
 @doc(tags=["出版社管理"])
+@bp_book.route('/press', methods=["GET", "POST"])
 class PressView(MethodResource):
     @doc(summary="出版社列表")
     @marshal_with(PressSchema(many=True))
@@ -94,6 +95,7 @@ class PressView(MethodResource):
 
 
 @doc(tags=["出版社管理"])
+@bp_book.route('/press/<int:pk>', methods=["GET", "POST", 'DELETE'])
 class PressEditView(MethodResource):
     @doc(summary="出版社详情")
     @marshal_with(PressSchema)
@@ -107,7 +109,7 @@ class PressEditView(MethodResource):
     @doc(summary="修改出版社")
     @use_kwargs(PressSchema(exclude=('id', ), partial=True))
     @marshal_with(PressSchema)
-    def put(self, pk, **kwargs):
+    def post(self, pk, **kwargs):
         press = Press.query.filter_by(id=int(pk), status=0).one_or_none()
         if press is None:
             return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
@@ -128,6 +130,7 @@ class PressEditView(MethodResource):
 
 
 @doc(tags=['图书管理'])
+@bp_book.route('/', methods=["GET", "POST"])
 class BookView(MethodResource):
     @doc(summary="图书列表")
     @marshal_with(BookSchema(many=True))
@@ -182,6 +185,7 @@ class BookView(MethodResource):
 
 
 @doc(tags=['图书管理'])
+@bp_book.route('/<int:pk>', methods=["GET", "POST", 'DELETE'])
 class BookEditView(MethodResource):
     @doc(summary="图书详情")
     @marshal_with(BookSchema)
@@ -203,7 +207,7 @@ class BookEditView(MethodResource):
     @doc(summary="修改图书")
     @use_kwargs(BookSchema(exclude=('id', ), partial=True))
     @marshal_with(BookSchema)
-    def put(self, pk, **kwargs):
+    def post(self, pk, **kwargs):
         press_obj = Press.query.filter_by(**kwargs.pop('press', None),
                                           status=0).one_or_none()
         if press_obj is not None:
@@ -242,6 +246,7 @@ class BookEditView(MethodResource):
 
 
 @doc(tags=['作者管理'])
+# @bp_book.route('/author', methods=["GET", "POST"])
 class AuthorView(MethodResource):
 
     @doc(summary='作者列表')
@@ -261,6 +266,7 @@ class AuthorView(MethodResource):
 
 
 @doc(tags=['作者管理'])
+# @bp_book.route('/author/<int:pk>', methods=["GET", "POST", 'DELETE'])
 class AuthorEditView(MethodResource):
 
     @doc(summary='获取作者信息')
@@ -274,7 +280,7 @@ class AuthorEditView(MethodResource):
     @doc(summary='修改作者信息')
     @use_kwargs(AuthorSchema(exclude=('id',), partial=True))
     @marshal_with(AuthorSchema)
-    def put(self, pk, **kwargs):
+    def post(self, pk, **kwargs):
         author = Author.query.filter_by(
             id=kwargs.get('id'), status=0).one_or_none()
         if author is None:

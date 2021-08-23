@@ -19,13 +19,10 @@ cors = CORS()
 migrate = Migrate(db=db)
 docs = FlaskApiSpec(document_options=False)  # 为False时不显示options方法
 limiter = Limiter(key_func=get_remote_address)
-babel = Babel()
+babel = Babel(configure_jinja=False)
 
 
-def resolver(schema):
-    return None
-
-apispec_plugin = MarshmallowPlugin(schema_name_resolver=resolver)
+apispec_plugin = MarshmallowPlugin(schema_name_resolver=lambda schema: None)
 
 
 def raw_sql(_sql):
@@ -41,11 +38,3 @@ def register_celery(celery, app):
                 return self.run(*args, **kwargs)
 
     celery.Task = ContextTask
-
-
-@babel.localeselector
-def get_locale():
-    # otherwise try to guess the language from the user accept
-    # header the browser transmits.  We support de/fr/en in this
-    # example.  The best match wins.
-    return request.accept_languages.best_match(['zh'])

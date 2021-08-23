@@ -15,6 +15,7 @@ def create_app(**kwargs):
     env = kwargs.get('env') or os.getenv('FLASK_ENV', 'development')
     app = Flask(__name__)
     print("use in: ", env)
+    print("root_path:", app.root_path)
     env_file = os.path.join(BASE_DIR, 'settings', env + '.py')
     app.config.from_pyfile(env_file)
     register_extensions(app)
@@ -28,13 +29,13 @@ def create_app(**kwargs):
 
 
 def register_blueprints(app):
-    from books.router import bp_client
+    from books import bp_client
     app.register_blueprint(bp_client, url_prefix='/client')
 
 
 def register_docs():
-    from books.router import register_docs_apps
-    register_docs_apps()
+    from books.docs import register_books_docs
+    register_books_docs()
 
 
 def register_extensions(app):
