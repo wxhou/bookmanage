@@ -90,8 +90,8 @@ def logout():
     db.session.commit()
     return response_succ()
 
+
 @doc(tags=['用户管理'])
-@bp_auth.route('/user', methods=["GET", "POST"])
 class UserView(MethodResource):
     """用户管理
     """
@@ -143,7 +143,6 @@ def active_user(token):
 
 
 @doc(tags=['用户管理'])
-@bp_auth.route('/user/<int:pk>', methods=["GET", 'POST', 'DELETE'])
 class UserEditView(MethodResource):
     """用户管理
     """

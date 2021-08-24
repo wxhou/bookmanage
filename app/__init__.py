@@ -29,7 +29,7 @@ def create_app(**kwargs):
 
 
 def register_blueprints(app):
-    from books import bp_client
+    from books.router import bp_client
     app.register_blueprint(bp_client, url_prefix='/client')
 
 

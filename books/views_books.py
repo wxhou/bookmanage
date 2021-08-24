@@ -76,7 +76,6 @@ def upload_book(**kwargs):
 
 
 @doc(tags=["出版社管理"])
-@bp_book.route('/press', methods=["GET", "POST"])
 class PressView(MethodResource):
     @doc(summary="出版社列表")
     @marshal_with(PressSchema(many=True))
@@ -95,7 +94,6 @@ class PressView(MethodResource):
 
 
 @doc(tags=["出版社管理"])
-@bp_book.route('/press/<int:pk>', methods=["GET", "POST", 'DELETE'])
 class PressEditView(MethodResource):
     @doc(summary="出版社详情")
     @marshal_with(PressSchema)
@@ -130,7 +128,6 @@ class PressEditView(MethodResource):
 
 
 @doc(tags=['图书管理'])
-@bp_book.route('/', methods=["GET", "POST"])
 class BookView(MethodResource):
     @doc(summary="图书列表")
     @marshal_with(BookSchema(many=True))
@@ -185,7 +182,6 @@ class BookView(MethodResource):
 
 
 @doc(tags=['图书管理'])
-@bp_book.route('/<int:pk>', methods=["GET", "POST", 'DELETE'])
 class BookEditView(MethodResource):
     @doc(summary="图书详情")
     @marshal_with(BookSchema)
@@ -246,7 +242,6 @@ class BookEditView(MethodResource):
 
 
 @doc(tags=['作者管理'])
-# @bp_book.route('/author', methods=["GET", "POST"])
 class AuthorView(MethodResource):
 
     @doc(summary='作者列表')
@@ -266,7 +261,6 @@ class AuthorView(MethodResource):
 
 
 @doc(tags=['作者管理'])
-# @bp_book.route('/author/<int:pk>', methods=["GET", "POST", 'DELETE'])
 class AuthorEditView(MethodResource):
 
     @doc(summary='获取作者信息')
