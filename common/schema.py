@@ -13,7 +13,7 @@ class PageSchema(Schema):
     @validates('page')
     def validate_page(self, value):
         try:
-            if  0 > int(value) > 99999999:
-                return value
-        except ValueError:
+            if not (0 < int(value) < 99999999):
+                raise ValidationError("value must be a number")
+        except:
             raise ValidationError("value must be a number")
