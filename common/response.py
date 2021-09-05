@@ -31,9 +31,7 @@ def response_succ(result=None, cookies=None, **kwargs):
         results = {'errcode': 0, 'errmsg': 'success'}
     else:
         results = deepcopy(result)
-    for k, v in kwargs.items():
-        results[k] = v
-    res = jsonify(results)
+    res = jsonify({**results, **kwargs})
     if cookies is not None:
         for k, v in cookies.items():
             res.set_cookie(k, v)

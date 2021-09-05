@@ -95,6 +95,7 @@ class PressView(MethodResource):
 
 @doc(tags=["出版社管理"])
 class PressEditView(MethodResource):
+
     @doc(summary="出版社详情")
     @marshal_with(PressSchema)
     def get(self, pk, **kwargs):
