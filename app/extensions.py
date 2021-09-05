@@ -30,11 +30,12 @@ def raw_sql(_sql):
 
 
 def register_celery(celery, app):
+    celery.flaskapp = app.app_context()
     class ContextTask(celery.Task):
         abstract = True
 
         def __call__(self, *args, **kwargs):
-            with app.app_context():
+            with celery.flaskapp:
                 return self.run(*args, **kwargs)
 
     celery.Task = ContextTask
