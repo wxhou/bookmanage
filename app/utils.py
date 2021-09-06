@@ -1,4 +1,5 @@
 import os
+import string
 import random
 import hashlib
 from itertools import product

@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_caching import Cache
 from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+from flask_limiter.util import get_ipaddr
 from flask_apispec.extension import FlaskApiSpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 
@@ -18,7 +18,7 @@ mail = Mail()
 cors = CORS()
 migrate = Migrate(db=db)
 docs = FlaskApiSpec(document_options=False)  # 为False时不显示options方法
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(key_func=get_ipaddr)
 babel = Babel(configure_jinja=False)
 
 
