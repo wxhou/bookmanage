@@ -78,8 +78,8 @@ def login(**kwargs):
     return response_err(ErrCode.COMMON_LOGIN_ERROR, 'username/password error')
 
 
-@bp_auth.get('/logout')
-@doc(tags=["登录注册"], summary="登出", deprecated=True)
+@bp_auth.route('/logout', methods=['GET', 'POST'])
+@doc(tags=["登录注册"], summary="登出") # deprecated=True 标记swagger删除
 @dc_login_required
 def logout():
     """登出"""
@@ -169,11 +169,3 @@ class UserEditView(MethodResource):
             setattr(user, k, v)
         db.session.commit()
         return response_succ(UserSchema().dump(user))
-
-    @doc(summary="删除用户")
-    @dc_login_required
-    def delete(self, pk):
-        user = User.query.filter_by(id=int(pk), status=0).one_or_none()
-        if user is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'user not exists')
-        return response_succ()
