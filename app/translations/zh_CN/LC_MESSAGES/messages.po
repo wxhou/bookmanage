@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-08-24 21:05+0800\n"
-"PO-Revision-Date: 2021-08-24 21:13+0800\n"
+"POT-Creation-Date: 2021-09-10 09:26+0800\n"
+"PO-Revision-Date: 2021-09-10 09:27+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
 "Language-Team: zh_Hans_CN <LL@li.org>\n"
@@ -18,25 +18,37 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
+#: app/decorators.py:14
+msgid "Not logged in"
+msgstr "没有登录"
+
+#: app/decorators.py:17
+msgid "Token type error"
+msgstr "认证类型错误"
+
+#: app/decorators.py:20
+msgid "Token validate error"
+msgstr "认证失败"
+
 #: books/views_demo.py:14
 msgid "hello world"
-msgstr "你好世界"
+msgstr "哈喽世界"
 
-#: env/Lib/site-packages/isort/main.py:159
+#: env/lib/python3.8/site-packages/isort/main.py:159
 msgid "show this help message and exit"
 msgstr ""
 
-#: env/Lib/site-packages/kombu/transport/qpid.py:1312
+#: env/lib/python3.8/site-packages/kombu/transport/qpid.py:1312
 #, python-format
 msgid "Attempting to connect to qpid with SASL mechanism %s"
 msgstr ""
 
-#: env/Lib/site-packages/kombu/transport/qpid.py:1317
+#: env/lib/python3.8/site-packages/kombu/transport/qpid.py:1317
 #, python-format
 msgid "Connected to qpid with SASL mechanism %s"
 msgstr ""
 
-#: env/Lib/site-packages/kombu/transport/qpid.py:1335
+#: env/lib/python3.8/site-packages/kombu/transport/qpid.py:1335
 #, python-format
 msgid "Unable to connect to qpid with SASL mechanism %s"
 msgstr ""
