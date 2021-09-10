@@ -17,6 +17,7 @@ bp_book = Blueprint('bp_book', __name__)
 @doc(tags=["图书管理"], summary="上传图书资料", type='file')
 @use_kwargs(BookMediaSchema, location='files')
 @marshal_with(schema=None, code=200, description="SUCCESS")
+@dc_login_required
 def upload_book(**kwargs):
     image = request.files.get('image')
     video = request.files.get('video')
@@ -77,6 +78,10 @@ def upload_book(**kwargs):
 
 @doc(tags=["出版社管理"])
 class PressView(MethodResource):
+
+    decorators = [dc_login_required]
+
+
     @doc(summary="出版社列表")
     @marshal_with(PressSchema(many=True))
     def get(self):
@@ -95,6 +100,9 @@ class PressView(MethodResource):
 
 @doc(tags=["出版社管理"])
 class PressEditView(MethodResource):
+
+    decorators = [dc_login_required]
+
 
     @doc(summary="出版社详情")
     @marshal_with(PressSchema)
@@ -130,6 +138,10 @@ class PressEditView(MethodResource):
 
 @doc(tags=['图书管理'])
 class BookView(MethodResource):
+
+    decorators = [dc_login_required]
+
+
     @doc(summary="图书列表")
     @marshal_with(BookSchema(many=True))
     def get(self):
@@ -184,6 +196,10 @@ class BookView(MethodResource):
 
 @doc(tags=['图书管理'])
 class BookEditView(MethodResource):
+
+    decorators = [dc_login_required]
+
+
     @doc(summary="图书详情")
     @marshal_with(BookSchema)
     def get(self, pk):
@@ -245,6 +261,8 @@ class BookEditView(MethodResource):
 @doc(tags=['作者管理'])
 class AuthorView(MethodResource):
 
+    decorators = [dc_login_required]
+
     @doc(summary='作者列表')
     @marshal_with(AuthorSchema(many=True))
     def get(self):
@@ -263,6 +281,8 @@ class AuthorView(MethodResource):
 
 @doc(tags=['作者管理'])
 class AuthorEditView(MethodResource):
+
+    decorators = [dc_login_required]
 
     @doc(summary='获取作者信息')
     @marshal_with(AuthorSchema)

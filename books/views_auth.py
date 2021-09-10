@@ -98,6 +98,7 @@ class UserView(MethodResource):
 
     @doc(summary="用户列表")
     @marshal_with(UserSchema(many=True))
+    @dc_login_required
     def get(self, **kwargs):
         user = User.query.filter_by(status=0)
         return response_succ(data=UserSchema(many=True).dump(user))
@@ -146,6 +147,8 @@ def active_user(token):
 class UserEditView(MethodResource):
     """用户管理
     """
+
+    decorators = [dc_login_required]
 
     @doc(summary="用户详情")
     @use_kwargs({'email': fields.Email()}, location='query')
