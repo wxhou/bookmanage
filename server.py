@@ -24,5 +24,5 @@ if os.path.exists(env_file):
     load_dotenv(env_file)
 
 
-my_celery = make_celery(__name__)
-app = create_app(celery=my_celery)
+book_manage_celery = make_celery(__name__)
+app = create_app(celery=book_manage_celery)

@@ -1,10 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 from flask_mail import Message
-from server import my_celery
+from server import book_manage_celery as celery
 from app.extensions import mail
 
 
-@my_celery.task
+@celery.task
 def send_register_email(register_url, email):
     message = Message(subject="激活链接",
                       recipients=[email],
