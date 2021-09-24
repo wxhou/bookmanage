@@ -134,7 +134,6 @@ class UserView(MethodResource):
 def active_user(token):
     """激活用户"""
     if User.validate_token(token):
-        current_app.logger.info(g.current_user)
         user = g.current_user
         user.active = True
         user.token = ''

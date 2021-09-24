@@ -3,7 +3,7 @@
 from datetime import datetime
 from flask import g, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import BadTimeSignature, SignatureExpired
+from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from app.extensions import db
 
@@ -83,7 +83,7 @@ class User(ModelMixin, db.Model):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
-        except (BadTimeSignature, SignatureExpired):
+        except (BadSignature, SignatureExpired):
             return False
         user = User.query.filter_by(id=data.get('id'), status=0).one_or_none()
         if user is not None and user.token == token:
