@@ -13,7 +13,7 @@ from .serializer import PressSchema, BookSchema, BookMediaSchema, AuthorSchema
 bp_book = Blueprint('bp_book', __name__)
 
 
-@bp_book.post('/book/upload')
+@bp_book.post('/upload')
 @doc(tags=["图书管理"], summary="上传图书资料", type='file')
 @use_kwargs(BookMediaSchema, location='files')
 @marshal_with(schema=None, code=200, description="SUCCESS")
