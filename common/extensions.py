@@ -22,6 +22,18 @@ limiter = Limiter(key_func=get_ipaddr)
 babel = Babel(configure_jinja=False)
 
 
+def register_extensions(app):
+    db.init_app(app)
+    migrate.init_app(app=app)
+    babel.init_app(app)
+    docs.init_app(app)
+    mail.init_app(app)
+    limiter.init_app(app)
+    cache.init_app(app, config=app.config['CACHE_CONFIG'])
+    cors.init_app(app)
+    app.redis_obj = cache.cache._write_client = cache.cache._read_clients
+
+
 apispec_plugin = MarshmallowPlugin(schema_name_resolver=lambda schema: None)
 
 

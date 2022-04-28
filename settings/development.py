@@ -1,8 +1,12 @@
-from settings.base import *
+import os
 from apispec import APISpec
-from app.extensions import apispec_plugin
+from common.extensions import apispec_plugin
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = True
+DEBUG_PORT = 5000
 DB_SERVER = os.getenv("DB_SERVER", "127.0.0.1")
 SECRET_KEY = "7fd2ad44-b91a-11eb-a15a-98e0d9885a43"
 BABEL_DEFAULT_LOCALE = 'en'
@@ -11,6 +15,20 @@ BABEL_DEFAULT_TIMEZONE = 'UTC'
 SQLALCHEMY_DATABASE_URI = "mysql://root:root1234@{}/db_booklibray".format(DB_SERVER)
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_ECHO = True
+
+
+# upload
+UPLOAD_MEDIA_FOLDER = os.path.join(BASE_DIR, 'media')
+UPLOAD_IMAGE_FOLDER = os.path.join(UPLOAD_MEDIA_FOLDER, 'images')
+UPLOAD_AUDIO_FOLDER = os.path.join(UPLOAD_MEDIA_FOLDER, 'audios')
+UPLOAD_VIDEO_FOLDER = os.path.join(UPLOAD_MEDIA_FOLDER, 'audios')
+
+# logger
+LOGGER_LEVEL = 'DEBUG'
+LOGGER_FORMATTER = '%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s'
+LOGGER_DIR = os.path.join(BASE_DIR, 'logs')
+LOGGER_FILE = os.path.join(LOGGER_DIR, 'server.log')
+LOGGER_FILE_WEBSOCKET = os.path.join(LOGGER_DIR, 'websocket.log')
 
 # mail
 MAIL_SERVER = os.getenv("MAIL_SERVER", 'smtp.126.com')

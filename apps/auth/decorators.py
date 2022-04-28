@@ -1,8 +1,8 @@
 from functools import wraps
 from flask import request, current_app
 from common.response import ErrCode, response_err
-from books.model import User
 from flask_babel import _
+from .model import User
 
 
 def dc_login_required(func):

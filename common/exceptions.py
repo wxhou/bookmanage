@@ -1,12 +1,13 @@
 import traceback
 from flask import current_app
 from flask_babel import lazy_gettext as _
+from marshmallow.exceptions import ValidationError
 from werkzeug.http import HTTP_STATUS_CODES
 from werkzeug.exceptions import HTTPException, InternalServerError
 from common.response import ErrCode, response_err, response_succ
 
 
-def register_errors(app):
+def register_exceptions(app):
     @app.errorhandler(404)
     def page_not_found(err):
         return response_err(ErrCode.COMMON_NOT_FOUND, HTTP_STATUS_CODES[404],
@@ -14,6 +15,7 @@ def register_errors(app):
 
     @app.errorhandler(422)
     @app.errorhandler(400)
+    @app.errorhandler(ValidationError)
     def request_error(err):
         """ValidationErrorRequest"""
         headers = err.data.get("headers")

@@ -2,20 +2,20 @@ import os
 from flask_apispec import doc, marshal_with, use_kwargs, MethodResource
 from flask import g, request, Blueprint, current_app, url_for
 from marshmallow import fields
-
-from app.extensions import cache, docs
-from app.decorators import dc_login_required
-from app.utils import allowed_file, random_filename
+from common.extensions import db, cache, docs
 from common.response import ErrCode, response_err, response_succ
+from common.utils import allowed_file, random_filename
 
-from .model import db, User, Avatar, Role
+from .model import Avatar, User, Role
+from .decorators import dc_login_required
 from .serializer import AvatarsSchema, UserSchema
 from .tasks import send_register_email
 
-bp_auth = Blueprint('bp_auth', __name__)
+
+bp_admin = Blueprint('bp_admin', __name__)
 
 
-@bp_auth.post('/avatar/upload')
+@bp_admin.post('/avatar/upload')
 @doc(tags=["用户管理"], summary="上传用户资料", type='file')
 @use_kwargs(AvatarsSchema, location='files')
 @marshal_with(schema=None, code=200, description='all good here')
@@ -63,7 +63,7 @@ def upload_avatar(**kwargs):
     return response_succ(data=result)
 
 
-@bp_auth.post('/login')
+@bp_admin.post('/login')
 @doc(tags=["登录注册"], summary='登录')
 @use_kwargs(UserSchema(only=('email', 'password')))
 def login(**kwargs):
@@ -78,7 +78,7 @@ def login(**kwargs):
     return response_err(ErrCode.COMMON_LOGIN_ERROR, 'username/password error')
 
 
-@bp_auth.route('/logout', methods=['GET', 'POST'])
+@bp_admin.route('/logout', methods=['GET', 'POST'])
 @doc(tags=["登录注册"], summary="登出") # deprecated=True 标记swagger删除
 @dc_login_required
 def logout():
@@ -130,7 +130,7 @@ class UserView(MethodResource):
 
 
 @doc(tags=["用户管理"], summary="用户激活")
-@bp_auth.get('/user/active/<token>')
+@bp_admin.get('/user/active/<token>')
 def active_user(token):
     """激活用户"""
     if User.validate_token(token):
@@ -171,3 +171,8 @@ class UserEditView(MethodResource):
             setattr(user, k, v)
         db.session.commit()
         return response_succ(UserSchema().dump(user))
+
+
+bp_admin.add_url_rule('/user', view_func=UserView.as_view('UserView'))
+bp_admin.add_url_rule('/user/<int:pk>',
+                     view_func=UserEditView.as_view('UserEditView'))

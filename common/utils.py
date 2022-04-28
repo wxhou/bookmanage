@@ -7,7 +7,6 @@ from flask import current_app
 from pypinyin import lazy_pinyin
 from werkzeug.utils import secure_filename
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from settings.base import UPLOAD_MEDIA_FOLDER
 
 
 def allowed_file(filetype, filename):
@@ -52,7 +51,7 @@ def random_color(s=1, e=255):
 
 def get_captcha(length=4, width=120, height=40):
     """生成验证码"""
-    font_file = os.path.join(UPLOAD_MEDIA_FOLDER, 'font', 'arial.ttf')
+    font_file = os.path.join(current_app.config['UPLOAD_MEDIA_FOLDER'], 'font', 'arial.ttf')
     image = Image.new('RGB', (width, height), (255, 255, 255))  # 创建Image对象
     font = ImageFont.truetype(font_file, 32)    # 创建Font对象
     draw = ImageDraw.Draw(image)    # 创建Draw对象

@@ -3,17 +3,17 @@ from flask import g, request, Blueprint, current_app
 from marshmallow import fields, validate
 from flask_apispec import doc, use_kwargs, marshal_with, MethodResource
 
+from common.extensions import cache
 from common.response import ErrCode, response_err, response_succ
-from app.utils import allowed_file, random_filename
-from app.decorators import dc_login_required
-from app.extensions import cache
+from common.utils import allowed_file, random_filename
+from apps.auth.decorators import dc_login_required
 from .model import db, Press, Book, BookMedia, Author
 from .serializer import PressSchema, BookSchema, BookMediaSchema, AuthorSchema
 
-bp_book = Blueprint('bp_book', __name__)
+bp_admin = Blueprint('bp_admin', __name__)
 
 
-@bp_book.post('/upload')
+@bp_admin.post('/upload')
 @doc(tags=["图书管理"], summary="上传图书资料", type='file')
 @use_kwargs(BookMediaSchema, location='files')
 @marshal_with(schema=None, code=200, description="SUCCESS")
@@ -312,3 +312,10 @@ class AuthorEditView(MethodResource):
         if author is None:
             return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
         return response_succ(AuthorSchema().dump(author))
+
+
+bp_admin.add_url_rule('/press', view_func=PressView.as_view('PressView'))
+bp_admin.add_url_rule('/press/<int:pk>',
+                     view_func=PressEditView.as_view('PressEditView'))
+bp_admin.add_url_rule('/', view_func=BookView.as_view('BookView'))
+bp_admin.add_url_rule('/<int:pk>', view_func=BookEditView.as_view('BookEditView'))

@@ -5,7 +5,7 @@ from flask import g, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from app.extensions import db
+from common.extensions import db
 
 roles_permissions = db.Table(
     'roles_permissions',
@@ -116,68 +116,3 @@ class Avatar(ModelMixin, db.Model):
     url = db.Column(db.String(256))
     mtype = db.Column(db.Integer)  # 资源类型(image 1/audio 2/video 3)
     ctype = db.Column(db.Integer)  # 图片类型(cover 1/content 2)
-
-
-class Press(ModelMixin, db.Model):
-    """出版社信息"""
-    # __tablename__ = 'book_press'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))  # 名称
-    addr = db.Column(db.String(128))  # 地址
-    books = db.relationship('Book', backref='press', lazy=True)
-
-
-author_books = db.Table(
-    'books',
-    db.Column('author_id',
-              db.Integer,
-              db.ForeignKey('author.id'),
-              primary_key=True),
-    db.Column('book_id',
-              db.Integer,
-              db.ForeignKey('book.id'),
-              primary_key=True))
-
-
-class Book(ModelMixin, db.Model):
-    """图书信息"""
-    # __tablename__ = 'book'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))  # 图书名称
-    ISBN = db.Column(db.String(64))  # 图书编号
-    translator = db.Column(db.String(64))  # 译者
-    desc = db.Column(db.Text)  # 简介
-    stock = db.Column(db.Integer)  # 库存
-    press_id = db.Column(db.Integer, db.ForeignKey('press.id'))  # 出版社ID
-    authors = db.relationship('Author',
-                              secondary=author_books,
-                              back_populates='books')
-
-
-class BookMedia(ModelMixin, db.Model):
-    """图书资源"""
-    # __tablename__ = 'book_media'
-    id = db.Column(db.Integer, primary_key=True)
-    book_id = db.Column(db.Integer)
-    url = db.Column(db.String(128))
-    mtype = db.Column(db.Integer)  # 资源类型(image 1/audio 2/video 3)
-    ctype = db.Column(db.Integer)  # 图片类型(cover 1/content 2)
-
-
-class Author(ModelMixin, db.Model):
-    """作者信息"""
-    # __tablename__ = 'book_author'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))  # 姓名
-    sex = db.Column(db.String(4))  # 性别
-    books = db.relationship('Book',
-                            secondary=author_books,
-                            back_populates='authors')
-
-
-class BorrowRead(ModelMixin, db.Model):
-    """借阅信息"""
-    # __tablename__ = 'book_borrowread'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    book_id = db.Column(db.Integer)
