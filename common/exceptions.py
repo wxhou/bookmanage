@@ -1,43 +1,48 @@
 import traceback
-from flask import current_app
-from flask_babel import lazy_gettext as _
+from flask import current_app, request
 from marshmallow.exceptions import ValidationError
-from werkzeug.http import HTTP_STATUS_CODES
-from werkzeug.exceptions import HTTPException, InternalServerError
-from common.response import ErrCode, response_err, response_succ
+from werkzeug.exceptions import InternalServerError
+from common.response import ErrCode, response_err
 
 
 def register_exceptions(app):
     @app.errorhandler(404)
     def page_not_found(err):
-        return response_err(ErrCode.COMMON_NOT_FOUND, HTTP_STATUS_CODES[404],
-                            err.code)
+        current_app.logger.error(request.url)
+        return response_err(ErrCode.COMMON_HTTP_STATUS_CODES[404], err.code)
 
     @app.errorhandler(422)
     @app.errorhandler(400)
     @app.errorhandler(ValidationError)
     def request_error(err):
         """ValidationErrorRequest"""
-        headers = err.data.get("headers")
-        message = err.data.get('messages', ["Invalid request."])
-        res = response_err(ErrCode.COMMON_PARAMS_ERROR,
-                           (message.get('json')), err.code, headers)
-        if headers:
-            for k, v in headers.items():
-                err.headers[k] = v
-        return res
+        current_app.logger.error("[ERROR]request url is : {}".format(request.url))
+        current_app.logger.error("[ERROR]request params is : {}".format(err.data))
+        current_app.logger.error("[ERROR]request message is : {}".format(err.messages))
+        response = response_err(ErrCode.COMMON_PARAMS_ERROR)
+        for k,v in err.data.get("headers", {}).items():
+            response.headers[k] = v
+        response.status_code = err.code
+        return response
+
 
     @app.errorhandler(429)
     def to_many_request(err):
-        return response_err(429, HTTP_STATUS_CODES[429], err.code)
+        response = response_err(ErrCode.COMMON_HTTP_STATUS_CODES[429])
+        response.status_code = err.code
+        return response
 
     @app.errorhandler(500)
     @app.errorhandler(InternalServerError)
     def internal_server_error(err):
         current_app.logger.critical(traceback.format_exc())
-        return response_err(500, HTTP_STATUS_CODES[500], err.code)
+        response = response_err(ErrCode.COMMON_HTTP_STATUS_CODES[500])
+        response.status_code = err.code
+        return response
 
     @app.errorhandler(Exception)
     def unknown_error(err):
         current_app.logger.critical(traceback.format_exc())
-        return response_err(ErrCode.COMMON_DB_ERROR, 'Unknown Error', 500)
+        response = response_err(ErrCode.COMMON_INTERNAL_ERR)
+        response.status_code = 500
+        return response

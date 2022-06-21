@@ -1,6 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 from flask_mail import Message
-from book import book_celery as celery
+from server import book_celery as celery
 from common.extensions import mail
 
 

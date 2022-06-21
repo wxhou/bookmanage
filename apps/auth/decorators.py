@@ -11,12 +11,12 @@ def dc_login_required(func):
     def wrappers(*args, **kwargs):
         authorization = request.headers.get('Authorization')
         if authorization is None:
-            return response_err(ErrCode.COMMON_TOKEN_ERROR, _('Not logged in'))
+            return response_err(ErrCode.AUTH_TOKEN_ERROR)
         token_type, token = authorization.split(None, 1)
         if token is None or token_type.lower() != 'bearer':
-            return response_err(ErrCode.COMMON_TOKEN_ERROR, _('Token type error'))
+            return response_err(ErrCode.AUTH_TOKEN_TYPE_ERROR)
         if User.validate_token(token):
             return func(*args, **kwargs)
-        return response_err(ErrCode.COMMON_TOKEN_ERROR, _('Token validate error'))
+        return response_err(ErrCode.AUTH_TOKEN_VALIDATE_ERROR)
 
     return wrappers

@@ -24,13 +24,12 @@ def upload_book(**kwargs):
     audio = request.files.get('audio')
     ctype = request.form.get('ctype')
     if not any([image, video, audio]):
-        return response_err(ErrCode.FILES_UPLOAD_ERROR, 'not file to upload')
+        return response_err(ErrCode.FILE_NOT_FOUND)
     result = {}
     if image:
         image_filename = image.filename.strip('" ')
         if not allowed_file('image', image_filename):
-            return response_err(ErrCode.FILES_UPLOAD_ERROR,
-                                'file is not allow')
+            return response_err(ErrCode.FILE_EXT_ERROR)
         hash_name = random_filename(image, image_filename)
         media_obj = BookMedia.query.filter_by(uid=hash_name).one_or_none()
         if media_obj is None:
@@ -46,8 +45,7 @@ def upload_book(**kwargs):
     if audio:
         audio_filename = audio.filename.strip('" ')
         if not allowed_file('audio', audio_filename):
-            return response_err(ErrCode.FILES_UPLOAD_ERROR,
-                                'file is not allow')
+            return response_err(ErrCode.FILE_EXT_ERROR)
         hash_name = random_filename(audio, audio_filename)
         media_obj = BookMedia.query.filter_by(uid=hash_name).one_or_none()
         if media_obj is None:
@@ -63,8 +61,7 @@ def upload_book(**kwargs):
     if video:
         video_filename = video.filename.strip('" ')
         if not allowed_file('video', video_filename):
-            return response_err(ErrCode.FILES_UPLOAD_ERROR,
-                                'file is not allow')
+            return response_err(ErrCode.FILE_EXT_ERROR)
         filename = random_filename(video_filename)
         filepath = os.path.join(current_app.config['UPLOAD_VIDEO_FOLDER'],
                                 filename)
@@ -110,7 +107,7 @@ class PressEditView(MethodResource):
         presss = Press.query.filter_by(id=int(pk), **kwargs,
                                        status=0).one_or_none()
         if presss is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+            return response_err(ErrCode.QUERY_NO_DATA)
         return response_succ(data=PressSchema().dump(presss))
 
     @doc(summary="修改出版社")
@@ -119,7 +116,7 @@ class PressEditView(MethodResource):
     def post(self, pk, **kwargs):
         press = Press.query.filter_by(id=int(pk), status=0).one_or_none()
         if press is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+            return response_err(ErrCode.QUERY_NO_DATA)
         for k, v in kwargs.items():
             setattr(press, k, v)
         db.session.commit()
@@ -130,7 +127,7 @@ class PressEditView(MethodResource):
     def delete(self, pk, **kwargs):
         press = Press.query.filter_by(id=int(pk), status=0).one_or_none()
         if press is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+            return response_err(ErrCode.QUERY_NO_DATA)
         press.status = -1
         db.session.commit()
         return response_succ()
@@ -205,7 +202,7 @@ class BookEditView(MethodResource):
     def get(self, pk):
         book = Book.query.filter_by(id=int(pk), status=0).one_or_none()
         if book is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+            return response_err(ErrCode.QUERY_NO_DATA)
         result = BookSchema().dump(book)
         book_media = BookMedia.query.filter_by(book_id=book.id, status=0)
         for med in book_media:
@@ -227,7 +224,7 @@ class BookEditView(MethodResource):
             kwargs['press'] = press_obj
         book = Book.query.filter_by(id=int(pk), status=0).one_or_none()
         if book is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+            return response_err(ErrCode.QUERY_NO_DATA)
         for k, v in kwargs.items():
             setattr(book, k, v)
         db.session.commit()
@@ -252,7 +249,7 @@ class BookEditView(MethodResource):
     def delete(self, pk):
         book = Book.query.filter_by(id=int(pk), status=0).one_or_none()
         if book is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+            return response_err(ErrCode.QUERY_NO_DATA)
         book.status = -1
         db.session.commit()
         return response_succ()
@@ -289,7 +286,7 @@ class AuthorEditView(MethodResource):
     def get(self, pk):
         author = Author.query.filter_by(id=int(pk), status=0).one_or_none()
         if author is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+            return response_err(ErrCode.QUERY_NO_DATA)
         return response_succ(AuthorSchema().dump(author))
 
     @doc(summary='修改作者信息')
@@ -299,7 +296,7 @@ class AuthorEditView(MethodResource):
         author = Author.query.filter_by(
             id=kwargs.get('id'), status=0).one_or_none()
         if author is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+            return response_err(ErrCode.QUERY_NO_DATA)
         for k, v in kwargs.items():
             setattr(author, k, v)
         db.session.commit()
@@ -310,7 +307,7 @@ class AuthorEditView(MethodResource):
     def delete(self, pk):
         author = Author.query.filter_by(id=int(pk), status=0).one_or_none()
         if author is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+            return response_err(ErrCode.QUERY_NO_DATA)
         return response_succ(AuthorSchema().dump(author))
 
 

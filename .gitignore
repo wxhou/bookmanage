@@ -144,3 +144,4 @@ migrations/
 *.mp4
 .vscode/
 .idea/
+.history/

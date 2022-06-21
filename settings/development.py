@@ -25,11 +25,11 @@ UPLOAD_VIDEO_FOLDER = os.path.join(UPLOAD_MEDIA_FOLDER, 'audios')
 
 # logger
 LOGGER_LEVEL = 'DEBUG'
-LOGGER_FORMATTER = '%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s'
+LOGGER_FORMATTER = '[%(asctime)s] %(levelname)s - %(current_user)s - %(funcName)s:%(lineno)d - %(message)s'
 LOGGER_DIR = os.path.join(BASE_DIR, 'logs')
 LOGGER_FILE = os.path.join(LOGGER_DIR, 'server.log')
 LOGGER_FILE_WEBSOCKET = os.path.join(LOGGER_DIR, 'websocket.log')
-
+LOGGER_FILE_MESSAGE = os.path.join(LOGGER_DIR, 'message.log')
 # mail
 MAIL_SERVER = os.getenv("MAIL_SERVER", 'smtp.126.com')
 MAIL_PORT = os.getenv("MAIL_PORT", 25)
@@ -57,7 +57,11 @@ CACHE_CONFIG = {
 
 # crontab
 SCHEDULER_API_ENABLED = True
-
+SCHEDULER_TIMEZONE = "Asia/Shanghai"
+SCHEDULER_JOB_DEFAULTS = {
+    'coalesce': True,
+    'max_instances': 1
+}
 # SWAGGER_2 文档配置
 # https://swagger.io/specification/v2/
 # https://editor.swagger.io/

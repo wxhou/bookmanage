@@ -24,13 +24,12 @@ def upload_avatar(**kwargs):
     video = request.files.get('video')
     ctype = request.form.get('ctype')
     if not any([image, video]):
-        return response_err(ErrCode.FILES_UPLOAD_ERROR, 'not file to upload')
+        return response_err(ErrCode.FILE_NOT_FOUND)
     result = {}
     if image:
         image_filename = image.filename.strip('" ')
         if not allowed_file('image', image_filename):
-            return response_err(ErrCode.FILES_UPLOAD_ERROR,
-                                'file is not allow')
+            return response_err(ErrCode.FILE_EXT_ERROR)
         hash_name = random_filename(image, image_filename)
         avatar_obj = Avatar.query.filter_by(uid=hash_name).one_or_none()
         if avatar_obj is None:
@@ -46,8 +45,7 @@ def upload_avatar(**kwargs):
     if video:
         video_filename = video.filename.strip('" ')
         if not allowed_file('video', video_filename):
-            return response_err(ErrCode.FILES_UPLOAD_ERROR,
-                                'file is not allow')
+            return response_err(ErrCode.FILE_EXT_ERROR)
         hash_name = random_filename(video, video_filename)
         avatar_obj = Avatar.query.filter_by(uid=hash_name).one_or_none()
         if avatar_obj is None:
@@ -75,7 +73,7 @@ def login(**kwargs):
         user.token = token
         db.session.commit()
         return response_succ(token=token, expire=expire)
-    return response_err(ErrCode.COMMON_LOGIN_ERROR, 'username/password error')
+    return response_err(ErrCode.AUTH_LOGIN_ERROR)
 
 
 @bp_admin.route('/logout', methods=['GET', 'POST'])
@@ -85,7 +83,7 @@ def logout():
     """登出"""
     user = User.query.filter_by(id=g.current_user.id, status=0).one_or_none()
     if user is None:
-        return response_err(ErrCode.QUERY_NO_DATA, 'logout error')
+        return response_err(ErrCode.USER_NOT_EXISTS)
     user.token = ''
     db.session.commit()
     return response_succ()
@@ -110,8 +108,7 @@ class UserView(MethodResource):
         email = kwargs.get('email')
         user = User.query.filter_by(email=email).one_or_none()
         if email and user is not None:
-            return response_err(ErrCode.COMMON_REGISTER_ERROR,
-                                'user has exists')
+            return response_err(ErrCode.USER_HAS_EXISTS)
         user = User(username=kwargs.get('username'),
                     email=email,
                     phone=kwargs.get('phone'),
@@ -139,7 +136,7 @@ def active_user(token):
         user.token = ''
         db.session.commit()
         return response_succ()
-    return response_err(ErrCode.COMMON_LOGIN_ERROR, 'register error')
+    return response_err(ErrCode.AUTH_REGISTER_ERROR)
 
 
 @doc(tags=['用户管理'])
@@ -156,7 +153,7 @@ class UserEditView(MethodResource):
         user = User.query.filter_by(id=int(pk), status=0,
                                     **kwargs).one_or_none()
         if user is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'data not exists')
+            return response_err(ErrCode.USER_NOT_EXISTS)
         return response_succ(data=UserSchema().dump(user))
 
     @doc(summary="修改用户信息")
@@ -166,7 +163,7 @@ class UserEditView(MethodResource):
     def post(self, pk, **kwargs):
         user = User.query.filter_by(id=int(pk), status=0).one_or_none()
         if user is None:
-            return response_err(ErrCode.QUERY_NO_DATA, 'user not exists')
+            return response_err(ErrCode.USER_NOT_EXISTS)
         for k, v in kwargs.items():
             setattr(user, k, v)
         db.session.commit()
