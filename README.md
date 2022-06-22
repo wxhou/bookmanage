@@ -1,11 +1,54 @@
 # 图书管理系统
 
 
-# step1
-pybabel extract -F babel.cfg -o messages.pot .
+### 启动项目
 
-# step2
-pybabel update -i messages.pot -d translations
+```shell
+make run
+```
 
-# step3
-pybabel compile -d translations
+
+### celery
+
+启动celery
+
+```shell
+celery -A server.book_celery worker -l info -P eventlet -c 1000
+```
+-C  并发量
+
+
+### FlaskBabel文档
+
+首先你必须进入到你的应用所在的文件夹中并且创建一个映射文件夹。对于典型的 Flask 应用，这是你要的:
+```cfg
+[python: **.py]
+[jinja2: **/templates/**.html]
+extensions=jinja2.ext.autoescape,jinja2.ext.with_
+```
+在你的应用中把它保存成 babel.cfg 或者其它类似的东东。接着是时候运行来自 Babel 中的 pybabel 命令来提取你的字符串:
+```shell
+$ pybabel extract -F babel.cfg -o messages.pot .
+```
+如果你使用了 lazy_gettext() 函数，你应该告诉 pybabel，这时候需要这样运行 pybabel:
+```shell
+$ pybabel extract -F babel.cfg -k lazy_gettext -o messages.pot .
+```
+这会使用 babel.cfg 文件中的映射并且在 messages.pot 里存储生成的模板。现在可以创建第一个翻译。例如使用这个命令可以翻译成中文:
+```shell
+$ pybabel init -i messages.pot -d translations -l zh_CN
+```
+-d translations 告诉 pybabel 存储翻译在这个文件夹中。这是 Flask-Babel 寻找翻译的地方。可以把它放在你的模板文件夹旁边。
+
+现在如有必要编辑 translations/de/LC_MESSAGES/messages.po 文件。如果你感到困惑的话请参阅一些 gettext 教程。
+
+为了能用需要编译翻译，pybabel 再次大显神通:
+```shell
+$ pybabel compile -d translations
+```
+如果字符串变化了怎么办？像上面一样创建一个新的 messages.pot 接着让 pybabel 整合这些变化:
+
+```shell
+$ pybabel update -i messages.pot -d translations
+```
+之后有些字符串可能会被标记成含糊不清。如果有含糊不清的字符串的时候，务必在编译之前手动地检查他们并且移除含糊不清的标志。

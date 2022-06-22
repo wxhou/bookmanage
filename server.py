@@ -98,11 +98,7 @@ def make_celery(app_name):
         "endable_utc": True
     }
 
-    celery = Celery(
-        app_name,
-        broker=config['broker_url'],
-        backend=config['result_backend']
-    )
+    celery = Celery(app_name)
     celery.conf.update(**config)
     celery.autodiscover_tasks(['apps.auth', 'apps.book'])
     return celery
