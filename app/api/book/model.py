@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 from datetime import datetime
-from common.extensions import db
+from app.common.extensions import db
 
 
 class Press(db.Model):

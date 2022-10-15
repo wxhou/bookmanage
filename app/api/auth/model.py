@@ -5,7 +5,7 @@ from flask import g, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from common.extensions import db
+from app.common.extensions import db
 
 roles_permissions = db.Table(
     'roles_permissions',

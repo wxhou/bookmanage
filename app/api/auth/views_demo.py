@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app, request
 from flask_babel import _
 from flask_apispec import doc, marshal_with
-from common.response import response_succ
+from app.common.response import response_succ
 
 
 bp_demo = Blueprint('bp_demo', __name__)

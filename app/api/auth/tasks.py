@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from flask_mail import Message
-from server import book_celery as celery
-from common.extensions import mail
+from app.core.celery_app import celery
+from app.common.extensions import mail
 
 
 @celery.task

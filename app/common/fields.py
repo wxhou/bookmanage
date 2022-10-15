@@ -1,5 +1,5 @@
 from marshmallow import fields
-from common.extensions import apispec_plugin
+from .extensions import apispec_plugin
 
 
 @apispec_plugin.map_to_openapi_type('file', None)

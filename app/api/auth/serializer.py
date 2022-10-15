@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, validate
-from common.fields import FileField
+from app.common.fields import FileField
 from .model import Avatar
 
 

@@ -3,11 +3,11 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask
-from celery import Celery
 from dotenv import load_dotenv
-from common.initial import register_initial
-from common.exceptions import register_exceptions
-from common.extensions import register_extensions, register_celery
+from app.common.initial import register_initial
+from app.common.exceptions import register_exceptions
+from app.common.extensions import register_extensions, register_celery
+from app.core.celery_app import celery
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -21,7 +21,7 @@ def create_app(**kwargs):
     app = Flask(__name__)
     print("use in: ", env)
     print("root_path:", app.root_path)
-    env_file = os.path.join(BASE_DIR, 'settings', env + '.py')
+    env_file = os.path.join(BASE_DIR, 'app', 'settings', env + '.py')
     app.config.from_pyfile(env_file)
     register_extensions(app)
     register_exceptions(app)
@@ -33,12 +33,12 @@ def create_app(**kwargs):
 
 
 def register_blueprints(app):
-    from apps.auth.router import bp_auth, register_auth_docs
-    from apps.book.router import bp_book, register_book_docs
+    from app.api.auth.router import bp_auth, register_auth_docs
+    from app.api.book.router import bp_book, register_book_docs
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_book)
-    register_auth_docs()
-    register_book_docs()
+    register_auth_docs(app)
+    register_book_docs(app)
 
 
 def register_logger(app: Flask):
@@ -88,22 +88,6 @@ def register_logger(app: Flask):
 
 
 
-def make_celery(app_name):
-
-    config = {
-        "cache_backend": 'redis',
-        "broker_url": 'redis://127.0.0.1:6379/1',
-        "result_backend": 'redis://127.0.0.1:6379/2',
-        "timezone": 'Asia/Shanghai',
-        "endable_utc": True
-    }
-
-    celery = Celery(app_name)
-    celery.conf.update(**config)
-    celery.autodiscover_tasks(['apps.auth', 'apps.book'])
-    return celery
-
-book_celery = make_celery(__name__)
-app = create_app(celery=book_celery)
+app = create_app(celery=celery)
 if __name__=='__main__':
     app.run(debug=True, port=app.config['DEBUG_PORT'])

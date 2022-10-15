@@ -2,9 +2,9 @@ import os
 from flask_apispec import doc, marshal_with, use_kwargs, MethodResource
 from flask import g, request, Blueprint, current_app, url_for
 from marshmallow import fields
-from common.extensions import db, cache, docs
-from common.response import ErrCode, response_err, response_succ
-from common.utils import allowed_file, random_filename
+from app.common.extensions import db, cache, docs
+from app.common.response import ErrCode, response_err, response_succ
+from app.common.utils import allowed_file, random_filename
 
 from .model import Avatar, User, Role
 from .decorators import dc_login_required

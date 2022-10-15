@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, validate
-from common.fields import FileField
+from app.common.fields import FileField
 
 
 class PressSchema(Schema):
@@ -16,7 +16,7 @@ class BookMediaSchema(Schema):
     image = FileField()
     audio = FileField()
     video = FileField()
-    ctype: fields.Int(default=1)
+    ctype = fields.Int(default=1)
 
 
 class BookSchema(Schema):

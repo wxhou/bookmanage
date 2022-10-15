@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import request, current_app
-from common.response import ErrCode, response_err
 from flask_babel import _
+from app.common.response import ErrCode, response_err
 from .model import User
 
 

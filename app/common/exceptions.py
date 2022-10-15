@@ -2,7 +2,7 @@ import traceback
 from flask import current_app, request
 from marshmallow.exceptions import ValidationError
 from werkzeug.exceptions import InternalServerError
-from common.response import ErrCode, response_err
+from .response import ErrCode, response_err
 
 
 def register_exceptions(app):

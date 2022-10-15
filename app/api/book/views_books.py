@@ -3,10 +3,10 @@ from flask import g, request, Blueprint, current_app
 from marshmallow import fields, validate
 from flask_apispec import doc, use_kwargs, marshal_with, MethodResource
 
-from common.extensions import cache
-from common.response import ErrCode, response_err, response_succ
-from common.utils import allowed_file, random_filename
-from apps.auth.decorators import dc_login_required
+from app.common.extensions import cache
+from app.common.response import ErrCode, response_err, response_succ
+from app.common.utils import allowed_file, random_filename
+from app.api.auth.decorators import dc_login_required
 from .model import db, Press, Book, BookMedia, Author
 from .serializer import PressSchema, BookSchema, BookMediaSchema, AuthorSchema
 

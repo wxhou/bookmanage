@@ -1,5 +1,5 @@
 from flask import Blueprint
-from common.extensions import docs
+from app.common.extensions import docs
 from . import views_admin
 
 # bp_auth
@@ -9,7 +9,8 @@ bp_auth.register_blueprint(views_admin.bp_admin)
 
 
 
-def register_auth_docs():
+def register_auth_docs(app):
+    print(app.url_map)
     docs.register(views_admin.upload_avatar,
                   blueprint='bp_auth.bp_admin')
     docs.register(views_admin.login,

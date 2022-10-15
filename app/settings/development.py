@@ -1,9 +1,8 @@
 import os
 from apispec import APISpec
-from common.extensions import apispec_plugin
+from app.common.extensions import apispec_plugin
+from server import BASE_DIR
 
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = True
 DEBUG_PORT = 5000

@@ -1,4 +1,5 @@
 {
     "python.formatting.provider": "autopep8",
-    "python.languageServer": "Default"
+    "python.languageServer": "Default",
+    "python.analysis.typeCheckingMode": "basic"
 }

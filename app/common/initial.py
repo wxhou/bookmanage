@@ -1,6 +1,6 @@
 
 import click
-from common.extensions import db
+from .extensions import db
 
 
 def register_initial(app):
@@ -26,7 +26,7 @@ def register_initial(app):
                   help='The password used to login.')
     def adminuser(email, password):
         """Create user."""
-        from apps.auth.model import User, Role
+        from api.auth.model import User, Role
 
         db.create_all()
 
@@ -50,7 +50,7 @@ def register_initial(app):
 
     @app.cli.command()
     def initrole():
-        from apps.auth.model import Role, Permission
+        from api.auth.model import Role, Permission
 
         roles_permissions_map = {
             'Guest': ['SEE'],
