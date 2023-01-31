@@ -23,12 +23,12 @@ def create_app(**kwargs):
     print("root_path:", app.root_path)
     env_file = os.path.join(BASE_DIR, 'app', 'settings', env + '.py')
     app.config.from_pyfile(env_file)
+    register_celery(kwargs.get('celery'), app)
+    register_blueprints(app)
     register_extensions(app)
     register_exceptions(app)
-    register_celery(kwargs.get('celery'), app)
     register_logger(app)
     register_initial(app)
-    register_blueprints(app)
     return app
 
 

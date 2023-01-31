@@ -99,7 +99,6 @@ def register_extensions(app):
     limiter.init_app(app)
     socketio.init_app(app)
     search.init_app(app)
-    scheduler.init_app(app)
     cache.init_app(app, config=app.config['CACHE_CONFIG'])
     cors.init_app(app)
     register_scheduler(app)
